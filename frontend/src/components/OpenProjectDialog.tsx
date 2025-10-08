@@ -26,33 +26,38 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
 
   const handleSelectPath = async () => {
     setIsSelectingPath(true);
+    console.log("Browse button clicked");
+    
     try {
-      // Check if we're running in Tauri (desktop app)
-      const isTauri = window.__TAURI__;
+      // Dynamic import of Tauri dialog
+      const dialog = await import("@tauri-apps/plugin-dialog");
+      console.log("Dialog plugin loaded");
       
-      if (isTauri) {
-        // Use Tauri's native dialog API (uses system's default file picker)
-        const { open } = await import("@tauri-apps/plugin-dialog");
-        const selected = await open({
-          directory: true,
-          multiple: false,
-          title: "Select Project Folder",
-        });
+      const selected = await dialog.open({
+        directory: true,
+        multiple: false,
+        title: "Select Project Folder",
+      });
+      
+      console.log("Selected folder:", selected);
+      
+      if (selected && typeof selected === 'string') {
+        const selectedPath = selected;
+        setProjectPath(selectedPath);
         
-        if (selected) {
-          const selectedPath = selected as string;
-          setProjectPath(selectedPath);
-          
-          // Auto-submit when folder is selected
-          const pathParts = selectedPath.split(/[/\\]/);
-          const projectName = pathParts[pathParts.length - 1] || "Project";
-          onOpenProject(selectedPath, projectName);
-          onClose();
-        }
+        // Auto-submit when folder is selected
+        const pathParts = selectedPath.split(/[/\\]/);
+        const projectName = pathParts[pathParts.length - 1] || "Project";
+        
+        console.log("Opening project:", projectName, "at", selectedPath);
+        onOpenProject(selectedPath, projectName);
+        onClose();
+      } else {
+        console.log("No folder selected or selection cancelled");
       }
     } catch (error) {
       console.error("Error opening folder picker:", error);
-      alert("Failed to open folder picker. Please try again.");
+      alert(`Failed to open folder picker: ${error}\n\nPlease ensure you're running the app in Tauri mode.`);
     } finally {
       setIsSelectingPath(false);
     }

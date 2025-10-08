@@ -24,46 +24,27 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
 
   useEffect(() => {
     const loadFileTree = async () => {
+      console.log("Loading file tree for path:", projectPath);
+      
+      if (!projectPath) {
+        console.log("No project path provided");
+        return;
+      }
+
       try {
-        // Check if we're running in Tauri
-        const isTauri = (window as any).__TAURI__;
+        // Always try to use Tauri commands
+        const { invoke } = await import("@tauri-apps/api/core");
+        console.log("Calling get_folder_structure with path:", projectPath);
         
-        if (isTauri) {
-          const { invoke } = await import("@tauri-apps/api/core");
-          const tree = await invoke<FileNode[]>("get_folder_structure", {
-            folderPath: projectPath
-          });
-          setFileTree(tree);
-        } else {
-          // Mock tree for web mode
-          const mockTree: FileNode[] = [
-            {
-              name: 'src',
-              path: `${projectPath}/src`,
-              type: 'folder',
-              expanded: true,
-              children: [
-                { name: 'App.tsx', path: `${projectPath}/src/App.tsx`, type: 'file' },
-                { name: 'main.tsx', path: `${projectPath}/src/main.tsx`, type: 'file' },
-                {
-                  name: 'components',
-                  path: `${projectPath}/src/components`,
-                  type: 'folder',
-                  expanded: false,
-                  children: [
-                    { name: 'Header.tsx', path: `${projectPath}/src/components/Header.tsx`, type: 'file' },
-                    { name: 'Sidebar.tsx', path: `${projectPath}/src/components/Sidebar.tsx`, type: 'file' },
-                  ]
-                }
-              ]
-            },
-            { name: 'package.json', path: `${projectPath}/package.json`, type: 'file' },
-            { name: 'README.md', path: `${projectPath}/README.md`, type: 'file' },
-          ];
-          setFileTree(mockTree);
-        }
+        const tree = await invoke<FileNode[]>("get_folder_structure", {
+          folderPath: projectPath
+        });
+        
+        console.log("Loaded file tree:", tree);
+        setFileTree(tree);
       } catch (error) {
         console.error("Failed to load file tree:", error);
+        alert(`Failed to load project files: ${error}\n\nPath: ${projectPath}`);
       }
     };
     
