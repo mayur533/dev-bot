@@ -16,7 +16,8 @@
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   overflow-x: auto;
-  min-height: 38px;
+  min-height: 48px;
+  align-items: center;
 }
 
 .no-tabs {
