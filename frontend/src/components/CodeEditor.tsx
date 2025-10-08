@@ -1,4 +1,4 @@
-import { X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from "lucide-react";
+import { X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Terminal } from "lucide-react";
 import "./CodeEditor.css";
 
 interface OpenFile {
@@ -16,8 +16,10 @@ interface CodeEditorProps {
   onFileChange: (filePath: string, newContent: string) => void;
   showExplorer: boolean;
   showChat: boolean;
+  showTerminal: boolean;
   onToggleExplorer: () => void;
   onToggleChat: () => void;
+  onToggleTerminal: () => void;
 }
 
 function CodeEditor({ 
@@ -28,8 +30,10 @@ function CodeEditor({
   onFileChange,
   showExplorer,
   showChat,
+  showTerminal,
   onToggleExplorer,
-  onToggleChat
+  onToggleChat,
+  onToggleTerminal
 }: CodeEditorProps) {
   
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -69,6 +73,13 @@ function CodeEditor({
         </div>
         
         <div className="tabs-toggles">
+          <button 
+            className="toggle-btn" 
+            onClick={onToggleTerminal}
+            title={showTerminal ? "Hide Terminal" : "Show Terminal"}
+          >
+            <Terminal size={16} />
+          </button>
           <button 
             className="toggle-btn" 
             onClick={onToggleExplorer}

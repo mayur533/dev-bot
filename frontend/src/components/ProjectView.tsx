@@ -37,6 +37,8 @@ function ProjectView({
   const [chatWidth, setChatWidth] = useState(350);
   const [showExplorer, setShowExplorer] = useState(true);
   const [showChat, setShowChat] = useState(true);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [terminalHeight, setTerminalHeight] = useState(200);
 
   const handleFileOpen = async (filePath: string, fileName: string) => {
     console.log("Opening file:", fileName, "at path:", filePath);
@@ -119,37 +121,55 @@ function ProjectView({
 
   return (
     <div className="project-view">
-      {showExplorer && (
-        <FileExplorer
-          projectPath={projectPath}
-          projectName={projectName}
-          width={explorerWidth}
-          onFileOpen={handleFileOpen}
-          onResize={setExplorerWidth}
-        />
-      )}
-      <CodeEditor
-        openFiles={openFiles}
-        activeFile={activeFile}
-        onFileSelect={setActiveFilePath}
-        onFileClose={handleFileClose}
-        onFileChange={handleFileChange}
-        showExplorer={showExplorer}
-        showChat={showChat}
-        onToggleExplorer={() => setShowExplorer(!showExplorer)}
-        onToggleChat={() => setShowChat(!showChat)}
-      />
-      {showChat && (
-        <ChatSidebar
-          messages={messages}
-          isLoading={isLoading}
-          width={chatWidth}
-          onSendMessage={onSendMessage}
-          onEditMessage={onEditMessage}
-          onRetryMessage={onRetryMessage}
-          onResize={setChatWidth}
-        />
-      )}
+      <div className="project-main">
+        {showExplorer && (
+          <FileExplorer
+            projectPath={projectPath}
+            projectName={projectName}
+            width={explorerWidth}
+            onFileOpen={handleFileOpen}
+            onResize={setExplorerWidth}
+          />
+        )}
+        <div className="editor-terminal-container">
+          <div className="editor-section" style={{ height: showTerminal ? `calc(100% - ${terminalHeight}px)` : '100%' }}>
+            <CodeEditor
+              openFiles={openFiles}
+              activeFile={activeFile}
+              onFileSelect={setActiveFilePath}
+              onFileClose={handleFileClose}
+              onFileChange={handleFileChange}
+              showExplorer={showExplorer}
+              showChat={showChat}
+              showTerminal={showTerminal}
+              onToggleExplorer={() => setShowExplorer(!showExplorer)}
+              onToggleChat={() => setShowChat(!showChat)}
+              onToggleTerminal={() => setShowTerminal(!showTerminal)}
+            />
+          </div>
+          {showTerminal && (
+            <div className="terminal-section" style={{ height: `${terminalHeight}px` }}>
+              <div className="terminal-header">
+                <span className="terminal-title">Terminal</span>
+              </div>
+              <div className="terminal-content">
+                <div className="terminal-output">$ Ready to execute commands...</div>
+              </div>
+            </div>
+          )}
+        </div>
+        {showChat && (
+          <ChatSidebar
+            messages={messages}
+            isLoading={isLoading}
+            width={chatWidth}
+            onSendMessage={onSendMessage}
+            onEditMessage={onEditMessage}
+            onRetryMessage={onRetryMessage}
+            onResize={setChatWidth}
+          />
+        )}
+      </div>
     </div>
   );
 }

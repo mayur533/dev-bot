@@ -118,6 +118,7 @@
   display: flex;
   height: 100%;
   overflow: auto;
+  position: relative;
 }
 
 .editor-lines {
@@ -128,6 +129,9 @@
   text-align: right;
   user-select: none;
   flex-shrink: 0;
+  position: sticky;
+  left: 0;
+  z-index: 1;
 }
 
 .line-number {
@@ -151,8 +155,9 @@
   outline: none;
   white-space: pre;
   overflow-wrap: normal;
-  overflow-x: auto;
+  overflow: hidden;
   tab-size: 2;
+  min-height: 100%;
 }
 
 /* Empty State */
@@ -195,9 +200,10 @@
   border-radius: 2px;
 }
 
+/* Only one scrollbar for editor wrapper */
 .editor-wrapper::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 .editor-wrapper::-webkit-scrollbar-track {
@@ -206,10 +212,14 @@
 
 .editor-wrapper::-webkit-scrollbar-thumb {
   background: var(--bg-tertiary);
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .editor-wrapper::-webkit-scrollbar-thumb:hover {
   background: var(--border-color);
+}
+
+.editor-wrapper::-webkit-scrollbar-corner {
+  background: var(--bg-primary);
 }
 
