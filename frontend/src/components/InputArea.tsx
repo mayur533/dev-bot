@@ -29,7 +29,9 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
     e.target.style.height = "auto";
-    const maxHeight = window.innerHeight * 0.5; // 50vh
+    // Calculate max height for 10 lines
+    const lineHeight = parseFloat(getComputedStyle(e.target).lineHeight) || 24; // fallback to 24px
+    const maxHeight = lineHeight * 10 + (compact ? 16 : 24); // 10 lines + padding
     e.target.style.height = Math.min(e.target.scrollHeight, maxHeight) + "px";
   };
 
