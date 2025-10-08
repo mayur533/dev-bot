@@ -98,12 +98,12 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
   const getFileIcon = (fileName: string) => {
     const ext = fileName.split('.').pop()?.toLowerCase();
     if (['ts', 'tsx', 'js', 'jsx', 'py', 'rs'].includes(ext || '')) {
-      return <FileCode size={16} />;
+      return <FileCode size={12} />;
     }
     if (['md', 'txt'].includes(ext || '')) {
-      return <FileText size={16} />;
+      return <FileText size={12} />;
     }
-    return <File size={16} />;
+    return <File size={12} />;
   };
 
   const renderTree = (nodes: FileNode[], level: number = 0) => {
@@ -116,8 +116,8 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
         >
           {node.type === 'folder' ? (
             <>
-              {node.expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-              <Folder size={16} className="folder-icon" />
+              {node.expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              <Folder size={12} className="folder-icon" />
             </>
           ) : (
             <>{getFileIcon(node.name)}</>

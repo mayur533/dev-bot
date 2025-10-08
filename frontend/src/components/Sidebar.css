@@ -94,10 +94,11 @@
   background-color: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 0.5rem;
-  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
-  font-size: 0.875rem;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 0.9375rem;
   color: var(--text-primary);
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .search-input:focus {
@@ -112,8 +113,8 @@
 
 .search-icon {
   position: absolute;
-  left: 0.75rem;
-  font-size: 0.875rem;
+  left: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
   pointer-events: none;
 }
