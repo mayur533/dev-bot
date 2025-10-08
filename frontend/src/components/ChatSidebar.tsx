@@ -106,7 +106,8 @@ function ChatSidebar({
       <div className="sidebar-input">
         <InputArea 
           onSendMessage={onSendMessage} 
-          isLoading={isLoading} 
+          isLoading={isLoading}
+          showFooter={false}
         />
       </div>
     </div>

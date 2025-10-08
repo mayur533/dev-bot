@@ -5,6 +5,7 @@ import "./InputArea.css";
 interface InputAreaProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
+  showFooter?: boolean;
 }
 
 interface AttachedFile {
@@ -13,7 +14,7 @@ interface AttachedFile {
   preview?: string;
 }
 
-function InputArea({ onSendMessage, isLoading }: InputAreaProps) {
+function InputArea({ onSendMessage, isLoading, showFooter = true }: InputAreaProps) {
   const [inputValue, setInputValue] = useState("");
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [showModelMenu, setShowModelMenu] = useState(false);
@@ -298,9 +299,11 @@ function InputArea({ onSendMessage, isLoading }: InputAreaProps) {
           </button>
         </div>
       </form>
-      <div className="input-footer">
-        Press <kbd>Enter</kbd> to send, <kbd>Shift+Enter</kbd> for new line
-      </div>
+      {showFooter && (
+        <div className="input-footer">
+          Press <kbd>Enter</kbd> to send, <kbd>Shift+Enter</kbd> for new line
+        </div>
+      )}
     </footer>
   );
 }
