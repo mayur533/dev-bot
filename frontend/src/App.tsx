@@ -78,6 +78,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showOpenProjectDialog, setShowOpenProjectDialog] = useState(false);
+  const [contextUsed, setContextUsed] = useState(0);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
@@ -128,6 +129,9 @@ function App() {
           : tab
       )
     );
+
+    // Update context usage (approximate: count characters in all messages)
+    setContextUsed((prev) => prev + content.length);
 
     setIsLoading(true);
 
@@ -617,6 +621,7 @@ app.listen(PORT, () => {
           onEditMessage={handleEditMessage}
           onRetryMessage={handleRetryMessage}
           onBackToChat={handleBackToChat}
+          contextUsed={contextUsed}
         />
       ) : (
         // Regular Chat View
@@ -642,7 +647,11 @@ app.listen(PORT, () => {
               onEditMessage={handleEditMessage}
               onRetryMessage={handleRetryMessage}
             />
-            <InputArea onSendMessage={handleSendMessage} isLoading={isLoading} />
+            <InputArea 
+              onSendMessage={handleSendMessage} 
+              isLoading={isLoading} 
+              contextUsed={contextUsed}
+            />
           </div>
         </>
       )}

@@ -12,6 +12,7 @@ interface ChatSidebarProps {
   onEditMessage: (messageId: string, newContent: string) => void;
   onRetryMessage: (messageId: string) => void;
   onResize: (width: number) => void;
+  contextUsed?: number;
 }
 
 function ChatSidebar({ 
@@ -21,7 +22,8 @@ function ChatSidebar({
   onSendMessage, 
   onEditMessage, 
   onRetryMessage,
-  onResize 
+  onResize,
+  contextUsed = 0
 }: ChatSidebarProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isResizingRef = useRef(false);
@@ -109,6 +111,7 @@ function ChatSidebar({
           isLoading={isLoading}
           showFooter={false}
           compact={true}
+          contextUsed={contextUsed}
         />
       </div>
     </div>

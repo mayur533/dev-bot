@@ -7,6 +7,8 @@ interface InputAreaProps {
   isLoading: boolean;
   showFooter?: boolean;
   compact?: boolean;
+  contextUsed?: number;
+  contextLimit?: number;
 }
 
 interface AttachedFile {
@@ -15,46 +17,52 @@ interface AttachedFile {
   preview?: string;
 }
 
-function InputArea({ onSendMessage, isLoading, showFooter = true, compact = false }: InputAreaProps) {
+function InputArea({ onSendMessage, isLoading, showFooter = true, compact = false, contextUsed = 0, contextLimit = 1000000 }: InputAreaProps) {
   const [inputValue, setInputValue] = useState("");
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [showModelMenu, setShowModelMenu] = useState(false);
   const [selectedModel, setSelectedModel] = useState("Gemini");
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [isRecording, setIsRecording] = useState(false);
+  const [contextPercentage, setContextPercentage] = useState(0);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const calculatedPercentage = (contextUsed / contextLimit) * 100;
+    setContextPercentage(Math.min(calculatedPercentage, 100));
+  }, [contextUsed, contextLimit]);
+
+  const getProgressColor = () => {
+    if (contextPercentage < 50) return "#10b981";
+    if (contextPercentage < 75) return "#f59e0b";
+    return "#ef4444";
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
     e.target.style.height = "auto";
     
-    if (compact) {
-      // Compact mode (IDE window) - 10 line expansion
-      const computedStyle = getComputedStyle(e.target);
-      const fontSize = parseFloat(computedStyle.fontSize);
-      const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
-      const paddingTop = parseFloat(computedStyle.paddingTop);
-      const paddingBottom = parseFloat(computedStyle.paddingBottom);
-      
-      // Calculate max height for 10 lines
-      const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
-      
-      // Set height to content height, but cap at 10 lines
-      const newHeight = Math.min(e.target.scrollHeight, maxHeight);
-      e.target.style.height = newHeight + "px";
-      
-      // Ensure overflow is set to auto when content exceeds 10 lines
-      if (e.target.scrollHeight > maxHeight) {
-        e.target.style.overflowY = "auto";
-      } else {
-        e.target.style.overflowY = "hidden";
-      }
+    // Both chat and IDE windows - 10 line expansion
+    const computedStyle = getComputedStyle(e.target);
+    const fontSize = parseFloat(computedStyle.fontSize);
+    const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
+    const paddingTop = parseFloat(computedStyle.paddingTop);
+    const paddingBottom = parseFloat(computedStyle.paddingBottom);
+    
+    // Calculate max height for 10 lines
+    const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
+    
+    // Set height to content height, but cap at 10 lines
+    const newHeight = Math.min(e.target.scrollHeight, maxHeight);
+    e.target.style.height = newHeight + "px";
+    
+    // Ensure overflow is set to auto when content exceeds 10 lines
+    if (e.target.scrollHeight > maxHeight) {
+      e.target.style.overflowY = "auto";
     } else {
-      // Regular mode (chat window) - normal expansion
-      const maxHeight = window.innerHeight * 0.5; // 50vh
-      e.target.style.height = Math.min(e.target.scrollHeight, maxHeight) + "px";
+      e.target.style.overflowY = "hidden";
     }
   };
 
@@ -168,33 +176,27 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
     if (inputRef.current) {
       const textarea = inputRef.current;
       
-      if (compact) {
-        // Compact mode (IDE window) - 10 line expansion
-        const computedStyle = getComputedStyle(textarea);
-        const fontSize = parseFloat(computedStyle.fontSize);
-        const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
-        const paddingTop = parseFloat(computedStyle.paddingTop);
-        const paddingBottom = parseFloat(computedStyle.paddingBottom);
-        
-        // Calculate max height for 10 lines
-        const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
-        
-        // Set initial height
-        textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
-        
-        // Ensure overflow is set correctly
-        if (textarea.scrollHeight > maxHeight) {
-          textarea.style.overflowY = "auto";
-        } else {
-          textarea.style.overflowY = "hidden";
-        }
+      // Both chat and IDE windows - 10 line expansion
+      const computedStyle = getComputedStyle(textarea);
+      const fontSize = parseFloat(computedStyle.fontSize);
+      const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
+      const paddingTop = parseFloat(computedStyle.paddingTop);
+      const paddingBottom = parseFloat(computedStyle.paddingBottom);
+      
+      // Calculate max height for 10 lines
+      const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
+      
+      // Set initial height
+      textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
+      
+      // Ensure overflow is set correctly
+      if (textarea.scrollHeight > maxHeight) {
+        textarea.style.overflowY = "auto";
       } else {
-        // Regular mode (chat window) - normal behavior
-        textarea.style.height = "auto";
-        textarea.style.height = textarea.scrollHeight + "px";
+        textarea.style.overflowY = "hidden";
       }
     }
-  }, [compact]);
+  }, []);
 
   return (
     <footer className="input-area">
@@ -216,6 +218,21 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
         />
 
         <div className={`input-container ${compact ? 'compact' : ''}`}>
+          {/* Context Indicator - Top Right */}
+          <div className="context-indicator-input">
+            <span className="context-label-input">Context</span>
+            <div className="context-progress-bar-input">
+              <div 
+                className="context-progress-fill-input" 
+                style={{ 
+                  width: `${contextPercentage}%`,
+                  backgroundColor: getProgressColor()
+                }}
+              />
+            </div>
+            <span className="context-percentage-input">{contextPercentage.toFixed(1)}%</span>
+          </div>
+
           {compact ? (
             // IDE Layout: File previews at top, controls at bottom
             <>

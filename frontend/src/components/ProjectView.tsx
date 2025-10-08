@@ -14,6 +14,7 @@ interface ProjectViewProps {
   onEditMessage: (messageId: string, newContent: string) => void;
   onRetryMessage: (messageId: string) => void;
   onBackToChat: () => void;
+  contextUsed?: number;
 }
 
 interface OpenFile {
@@ -31,7 +32,8 @@ function ProjectView({
   onSendMessage,
   onEditMessage,
   onRetryMessage,
-  onBackToChat
+  onBackToChat,
+  contextUsed = 0
 }: ProjectViewProps) {
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
@@ -170,6 +172,7 @@ function ProjectView({
             onEditMessage={onEditMessage}
             onRetryMessage={onRetryMessage}
             onResize={setChatWidth}
+            contextUsed={contextUsed}
           />
         )}
       </div>
