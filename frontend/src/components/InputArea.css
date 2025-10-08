@@ -9,6 +9,15 @@
   flex-shrink: 0;
 }
 
+/* File Previews - At the top */
+.file-previews-top {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  min-height: 40px;
+  align-items: center;
+}
+
 /* Small File Preview - Inside input box */
 .file-preview-small {
   position: relative;
@@ -120,12 +129,10 @@
 /* Input Container - wraps everything */
 .input-container {
   display: flex;
-  gap: 0.375rem;
-  align-items: flex-end;
+  flex-direction: column;
   background-color: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 0.5rem;
-  padding: 0.375rem;
   transition: border-color 0.2s;
 }
 
@@ -133,28 +140,27 @@
   border-color: var(--button-bg);
 }
 
-/* Left Controls Container */
-.input-left-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  align-items: flex-start;
-  align-self: flex-end;
-}
-
-/* File Previews Inline */
-.file-previews-inline {
-  display: flex;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-  max-width: 60px;
-}
-
-/* Bottom Controls Row */
+/* Bottom Controls Container */
 .bottom-controls {
   display: flex;
-  gap: 0.25rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  flex-shrink: 0;
 }
+
+/* Left and Right Control Groups */
+.left-controls,
+.right-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
 
 /* Control Group with Dropdown */
 .control-group {
@@ -249,7 +255,7 @@
   flex: 1;
   background-color: transparent;
   border: none;
-  padding: 0.5rem;
+  padding: 0.75rem;
   font-size: 1rem;
   font-family: inherit;
   color: var(--text-primary);
@@ -259,13 +265,14 @@
   line-height: 1.5;
   overflow-y: auto;
   box-sizing: border-box;
+  border-radius: 0;
 }
 
 /* Compact mode - for IDE window */
 .input-container.compact .input-textarea {
   min-height: 52px;
   font-size: 0.875rem;
-  padding: 0.375rem 0.5rem;
+  padding: 0.5rem;
 }
 
 /* Hide scrollbars completely */
