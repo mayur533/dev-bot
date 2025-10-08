@@ -37,25 +37,26 @@ function ProjectView({
   const [chatWidth, setChatWidth] = useState(350);
 
   const handleFileOpen = async (filePath: string, fileName: string) => {
+    console.log("Opening file:", fileName, "at path:", filePath);
+    
     // Check if file is already open
     const existingFile = openFiles.find(f => f.path === filePath);
     if (existingFile) {
+      console.log("File already open, switching to it");
       setActiveFilePath(filePath);
       return;
     }
 
     try {
-      let fileContent = `// File: ${fileName}\n// Path: ${filePath}\n\n// File content will be loaded here`;
+      // Read file content via Tauri
+      const { invoke } = await import("@tauri-apps/api/core");
+      console.log("Invoking read_file_content for:", filePath);
       
-      // Check if we're running in Tauri
-      const isTauri = (window as any).__TAURI__;
+      const fileContent = await invoke<string>("read_file_content", {
+        filePath: filePath
+      });
       
-      if (isTauri) {
-        const { invoke } = await import("@tauri-apps/api/core");
-        fileContent = await invoke<string>("read_file_content", {
-          filePath: filePath
-        });
-      }
+      console.log("File content loaded, length:", fileContent.length);
 
       const fileExtension = fileName.split('.').pop() || '';
       const language = getLanguageFromExtension(fileExtension);
@@ -69,9 +70,10 @@ function ProjectView({
 
       setOpenFiles([...openFiles, newFile]);
       setActiveFilePath(filePath);
+      console.log("File opened successfully");
     } catch (error) {
       console.error("Failed to open file:", error);
-      alert(`Failed to open file: ${error}`);
+      alert(`Failed to open file: ${error}\n\nFile: ${fileName}\nPath: ${filePath}`);
     }
   };
 
