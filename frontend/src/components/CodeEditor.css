@@ -115,10 +115,16 @@
 }
 
 .editor-wrapper {
-  display: flex;
+  display: block;
   height: 100%;
   overflow: auto;
   position: relative;
+}
+
+.editor-content-inner {
+  display: flex;
+  min-width: 100%;
+  width: fit-content;
 }
 
 .editor-lines {
@@ -155,9 +161,10 @@
   outline: none;
   white-space: pre;
   overflow-wrap: normal;
-  overflow: hidden;
+  overflow: visible;
   tab-size: 2;
   min-height: 100%;
+  min-width: fit-content;
 }
 
 /* Empty State */

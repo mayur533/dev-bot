@@ -101,17 +101,19 @@ function CodeEditor({
       <div className="editor-content">
         {activeFile ? (
           <div className="editor-wrapper">
-            <div className="editor-lines">
-              {activeFile.content.split('\n').map((_, index) => (
-                <div key={index} className="line-number">{index + 1}</div>
-              ))}
+            <div className="editor-content-inner">
+              <div className="editor-lines">
+                {activeFile.content.split('\n').map((_, index) => (
+                  <div key={index} className="line-number">{index + 1}</div>
+                ))}
+              </div>
+              <textarea
+                className="editor-textarea"
+                value={activeFile.content}
+                onChange={handleEditorChange}
+                spellCheck={false}
+              />
             </div>
-            <textarea
-              className="editor-textarea"
-              value={activeFile.content}
-              onChange={handleEditorChange}
-              spellCheck={false}
-            />
           </div>
         ) : (
           <div className="editor-empty">
