@@ -6,6 +6,7 @@ interface InputAreaProps {
   onSendMessage: (message: string) => void;
   isLoading: boolean;
   showFooter?: boolean;
+  compact?: boolean;
 }
 
 interface AttachedFile {
@@ -14,7 +15,7 @@ interface AttachedFile {
   preview?: string;
 }
 
-function InputArea({ onSendMessage, isLoading, showFooter = true }: InputAreaProps) {
+function InputArea({ onSendMessage, isLoading, showFooter = true, compact = false }: InputAreaProps) {
   const [inputValue, setInputValue] = useState("");
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const [showModelMenu, setShowModelMenu] = useState(false);
@@ -156,7 +157,7 @@ function InputArea({ onSendMessage, isLoading, showFooter = true }: InputAreaPro
           style={{ display: 'none' }}
         />
 
-        <div className="input-container">
+        <div className={`input-container ${compact ? 'compact' : ''}`}>
           <div className="input-left-controls">
             {/* File Previews - Small inside input above buttons */}
             {attachedFiles.length > 0 && (

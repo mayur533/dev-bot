@@ -108,6 +108,7 @@ function ChatSidebar({
           onSendMessage={onSendMessage} 
           isLoading={isLoading}
           showFooter={false}
+          compact={true}
         />
       </div>
     </div>
