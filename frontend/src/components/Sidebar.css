@@ -1,0 +1,404 @@
+/* ========================================
+   Sidebar Styles
+   ======================================== */
+
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex-shrink: 0;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 64px;
+}
+
+/* ========================================
+   Header
+   ======================================== */
+
+.sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 60px;
+}
+
+.sidebar.collapsed .sidebar-header {
+  padding: 1rem 0.5rem;
+  justify-content: center;
+}
+
+.sidebar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.menu-toggle-btn {
+  background-color: var(--button-bg);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.menu-toggle-btn:hover {
+  background-color: var(--button-hover);
+  transform: scale(1.05);
+}
+
+.menu-toggle-btn .icon {
+  font-size: 1.125rem;
+}
+
+/* ========================================
+   Sidebar Actions (Search & Buttons)
+   ======================================== */
+
+.sidebar-actions {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Search Bar */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  width: 100%;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+/* Action Buttons */
+.sidebar-actions .action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  background-color: var(--button-secondary-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  justify-content: flex-start;
+  width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+}
+
+.sidebar-actions .action-btn:hover {
+  background-color: var(--button-secondary-hover);
+  transform: translateY(-1px);
+}
+
+.sidebar-actions .action-btn:active {
+  transform: translateY(0);
+}
+
+/* New Chat button with green background */
+.sidebar-actions .action-btn.primary {
+  background-color: var(--button-bg);
+  color: white;
+  border-color: var(--button-bg);
+}
+
+.sidebar-actions .action-btn.primary:hover {
+  background-color: var(--button-hover);
+  border-color: var(--button-hover);
+}
+
+.btn-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.btn-text {
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ========================================
+   Tabs List
+   ======================================== */
+
+.tabs-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: transparent;
+  border: 1px solid transparent;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.tab-item.collapsed {
+  justify-content: center;
+  padding: 0.625rem 0.5rem;
+}
+
+.tab-item:hover {
+  background-color: var(--tab-hover-bg);
+}
+
+.tab-item.active {
+  background-color: var(--tab-active-bg);
+  border-color: var(--button-bg);
+}
+
+.tab-item:active {
+  transform: scale(0.98);
+}
+
+.tab-content {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.tab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.tab-icon {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tab-title {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.tab-path {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.delete-tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.15s ease;
+  opacity: 0;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.tab-item:hover .delete-tab-btn {
+  opacity: 1;
+}
+
+.delete-tab-btn:hover {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+.sidebar-footer {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 60px;
+}
+
+.sidebar-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.info-label {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.user-settings-btn {
+  background: var(--button-secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+}
+
+.user-settings-btn:hover {
+  background: var(--button-secondary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-settings-btn:active {
+  transform: translateY(0);
+}
+
+.user-settings-btn .icon {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+/* ========================================
+   Scrollbar
+   ======================================== */
+
+.tabs-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tabs-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabs-list::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 3px;
+}
+
+.tabs-list::-webkit-scrollbar-thumb:hover {
+  background: var(--border-color);
+}
+
+/* ========================================
+   Collapsed Sidebar States
+   ======================================== */
+
+.sidebar.collapsed .sidebar-title,
+.sidebar.collapsed .sidebar-actions,
+.sidebar.collapsed .sidebar-footer,
+.sidebar.collapsed .tab-title,
+.sidebar.collapsed .tab-path,
+.sidebar.collapsed .delete-tab-btn {
+  display: none;
+}
+
+.sidebar.collapsed .menu-toggle-btn {
+  width: 32px;
+  height: 32px;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 240px;
+  }
+
+  .sidebar.collapsed {
+    width: 60px;
+  }
+
+  .sidebar-header {
+    padding: 0.875rem;
+  }
+
+  .tab-item {
+    padding: 0.5rem;
+  }
+
+  .sidebar-actions {
+    padding: 0.625rem;
+  }
+}
