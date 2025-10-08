@@ -21,6 +21,7 @@ interface FileNode {
 function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }: FileExplorerProps) {
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [isResizing, setIsResizing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadFileTree = async () => {
@@ -28,8 +29,11 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
       
       if (!projectPath) {
         console.log("No project path provided");
+        setIsLoading(false);
         return;
       }
+
+      setIsLoading(true);
 
       try {
         // Always try to use Tauri commands
@@ -41,10 +45,22 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
         });
         
         console.log("Loaded file tree:", tree);
-        setFileTree(tree);
+        
+        // Set all folders to be collapsed initially
+        const setInitialExpanded = (nodes: FileNode[]): FileNode[] => {
+          return nodes.map(node => ({
+            ...node,
+            expanded: false,
+            children: node.children ? setInitialExpanded(node.children) : node.children
+          }));
+        };
+        
+        setFileTree(setInitialExpanded(tree));
       } catch (error) {
         console.error("Failed to load file tree:", error);
         alert(`Failed to load project files: ${error}\n\nPath: ${projectPath}`);
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -139,7 +155,22 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
         <span className="explorer-title">{projectName}</span>
       </div>
       <div className="explorer-content">
-        {renderTree(fileTree)}
+        {isLoading ? (
+          <div className="explorer-loading">
+            <div className="loading-spinner-explorer">
+              <div className="spinner-dot"></div>
+              <div className="spinner-dot"></div>
+              <div className="spinner-dot"></div>
+            </div>
+            <span className="loading-text">Loading files...</span>
+          </div>
+        ) : fileTree.length === 0 ? (
+          <div className="explorer-empty">
+            <span>No files found</span>
+          </div>
+        ) : (
+          renderTree(fileTree)
+        )}
       </div>
       <div
         className="resize-handle"
