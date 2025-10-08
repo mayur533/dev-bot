@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from "lucide-react";
 import "./CodeEditor.css";
 
 interface OpenFile {
@@ -14,9 +14,23 @@ interface CodeEditorProps {
   onFileSelect: (filePath: string) => void;
   onFileClose: (filePath: string) => void;
   onFileChange: (filePath: string, newContent: string) => void;
+  showExplorer: boolean;
+  showChat: boolean;
+  onToggleExplorer: () => void;
+  onToggleChat: () => void;
 }
 
-function CodeEditor({ openFiles, activeFile, onFileSelect, onFileClose, onFileChange }: CodeEditorProps) {
+function CodeEditor({ 
+  openFiles, 
+  activeFile, 
+  onFileSelect, 
+  onFileClose, 
+  onFileChange,
+  showExplorer,
+  showChat,
+  onToggleExplorer,
+  onToggleChat
+}: CodeEditorProps) {
   
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (activeFile) {
@@ -26,31 +40,50 @@ function CodeEditor({ openFiles, activeFile, onFileSelect, onFileClose, onFileCh
 
   return (
     <div className="code-editor">
-      {/* File Tabs */}
+      {/* File Tabs with Toggle Buttons */}
       <div className="editor-tabs">
-        {openFiles.length === 0 ? (
-          <div className="no-tabs">No files open</div>
-        ) : (
-          openFiles.map((file) => (
-            <div
-              key={file.path}
-              className={`editor-tab ${activeFile?.path === file.path ? 'active' : ''}`}
-              onClick={() => onFileSelect(file.path)}
-            >
-              <span className="tab-name">{file.name}</span>
-              <button
-                className="tab-close"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onFileClose(file.path);
-                }}
-                title="Close"
+        <div className="tabs-toggles">
+          <button 
+            className="toggle-btn" 
+            onClick={onToggleExplorer}
+            title={showExplorer ? "Hide Explorer" : "Show Explorer"}
+          >
+            {showExplorer ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
+          </button>
+          <button 
+            className="toggle-btn" 
+            onClick={onToggleChat}
+            title={showChat ? "Hide Chat" : "Show Chat"}
+          >
+            {showChat ? <PanelRightClose size={16} /> : <PanelRightOpen size={16} />}
+          </button>
+        </div>
+        
+        <div className="tabs-container">
+          {openFiles.length === 0 ? (
+            <div className="no-tabs">No files open</div>
+          ) : (
+            openFiles.map((file) => (
+              <div
+                key={file.path}
+                className={`editor-tab ${activeFile?.path === file.path ? 'active' : ''}`}
+                onClick={() => onFileSelect(file.path)}
               >
-                <X size={14} />
-              </button>
-            </div>
-          ))
-        )}
+                <span className="tab-name">{file.name}</span>
+                <button
+                  className="tab-close"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onFileClose(file.path);
+                  }}
+                  title="Close"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {/* Editor Content */}

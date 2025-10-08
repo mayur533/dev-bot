@@ -35,6 +35,8 @@ function ProjectView({
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
   const [explorerWidth, setExplorerWidth] = useState(250);
   const [chatWidth, setChatWidth] = useState(350);
+  const [showExplorer, setShowExplorer] = useState(true);
+  const [showChat, setShowChat] = useState(true);
 
   const handleFileOpen = async (filePath: string, fileName: string) => {
     console.log("Opening file:", fileName, "at path:", filePath);
@@ -117,29 +119,37 @@ function ProjectView({
 
   return (
     <div className="project-view">
-      <FileExplorer
-        projectPath={projectPath}
-        projectName={projectName}
-        width={explorerWidth}
-        onFileOpen={handleFileOpen}
-        onResize={setExplorerWidth}
-      />
+      {showExplorer && (
+        <FileExplorer
+          projectPath={projectPath}
+          projectName={projectName}
+          width={explorerWidth}
+          onFileOpen={handleFileOpen}
+          onResize={setExplorerWidth}
+        />
+      )}
       <CodeEditor
         openFiles={openFiles}
         activeFile={activeFile}
         onFileSelect={setActiveFilePath}
         onFileClose={handleFileClose}
         onFileChange={handleFileChange}
+        showExplorer={showExplorer}
+        showChat={showChat}
+        onToggleExplorer={() => setShowExplorer(!showExplorer)}
+        onToggleChat={() => setShowChat(!showChat)}
       />
-      <ChatSidebar
-        messages={messages}
-        isLoading={isLoading}
-        width={chatWidth}
-        onSendMessage={onSendMessage}
-        onEditMessage={onEditMessage}
-        onRetryMessage={onRetryMessage}
-        onResize={setChatWidth}
-      />
+      {showChat && (
+        <ChatSidebar
+          messages={messages}
+          isLoading={isLoading}
+          width={chatWidth}
+          onSendMessage={onSendMessage}
+          onEditMessage={onEditMessage}
+          onRetryMessage={onRetryMessage}
+          onResize={setChatWidth}
+        />
+      )}
     </div>
   );
 }
