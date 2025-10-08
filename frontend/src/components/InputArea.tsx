@@ -29,10 +29,20 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
     e.target.style.height = "auto";
+    
     // Calculate max height for 10 lines
-    const lineHeight = parseFloat(getComputedStyle(e.target).lineHeight) || 24; // fallback to 24px
-    const maxHeight = lineHeight * 10 + (compact ? 16 : 24); // 10 lines + padding
-    e.target.style.height = Math.min(e.target.scrollHeight, maxHeight) + "px";
+    const computedStyle = getComputedStyle(e.target);
+    const fontSize = parseFloat(computedStyle.fontSize);
+    const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
+    const paddingTop = parseFloat(computedStyle.paddingTop);
+    const paddingBottom = parseFloat(computedStyle.paddingBottom);
+    
+    // Calculate max height for 10 lines
+    const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
+    
+    // Set height to content height, but cap at 10 lines
+    const newHeight = Math.min(e.target.scrollHeight, maxHeight);
+    e.target.style.height = newHeight + "px";
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -139,6 +149,24 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [showAttachmentMenu, showModelMenu]);
+
+  // Initialize textarea height
+  useEffect(() => {
+    if (inputRef.current) {
+      const textarea = inputRef.current;
+      const computedStyle = getComputedStyle(textarea);
+      const fontSize = parseFloat(computedStyle.fontSize);
+      const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
+      const paddingTop = parseFloat(computedStyle.paddingTop);
+      const paddingBottom = parseFloat(computedStyle.paddingBottom);
+      
+      // Calculate max height for 10 lines
+      const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
+      
+      // Set initial height
+      textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
+    }
+  }, [compact]);
 
   return (
     <footer className="input-area">

@@ -263,7 +263,6 @@
   color: var(--text-primary);
   resize: none;
   min-height: 40px;
-  max-height: calc(1.5em * 10 + 1.5rem); /* 10 lines + padding */
   line-height: 1.5;
   overflow-y: auto;
   box-sizing: border-box;
@@ -273,7 +272,6 @@
 /* Compact mode - for IDE window */
 .input-container.compact .input-textarea {
   min-height: 52px;
-  max-height: calc(1.5em * 10 + 1rem); /* 10 lines + padding for compact */
   font-size: 0.875rem;
   padding: 0.5rem;
 }
