@@ -8,6 +8,7 @@ interface FileExplorerProps {
   width: number;
   onFileOpen: (filePath: string, fileName: string) => void;
   onResize: (width: number) => void;
+  onBackToChat: () => void;
 }
 
 interface FileNode {
@@ -18,7 +19,7 @@ interface FileNode {
   expanded?: boolean;
 }
 
-function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }: FileExplorerProps) {
+function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize, onBackToChat }: FileExplorerProps) {
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [isResizing, setIsResizing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -163,6 +164,13 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
     <div className="file-explorer" style={{ width: `${width}px` }}>
       <div className="explorer-header">
         <span className="explorer-title">{projectName}</span>
+        <button 
+          className="close-ide-btn" 
+          onClick={onBackToChat}
+          title="Close IDE"
+        >
+          💬 Close IDE
+        </button>
       </div>
       <div className="explorer-content">
         {isLoading ? (

@@ -131,6 +131,7 @@ function ProjectView({
             width={explorerWidth}
             onFileOpen={handleFileOpen}
             onResize={setExplorerWidth}
+            onBackToChat={onBackToChat}
           />
         )}
         <div className="editor-terminal-container">
@@ -147,7 +148,6 @@ function ProjectView({
               onToggleExplorer={() => setShowExplorer(!showExplorer)}
               onToggleChat={() => setShowChat(!showChat)}
               onToggleTerminal={() => setShowTerminal(!showTerminal)}
-              onBackToChat={onBackToChat}
             />
           </div>
           {showTerminal && (
