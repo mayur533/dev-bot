@@ -366,133 +366,129 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
               </div>
             </>
           ) : (
-            // Chat Layout: Controls with file previews above left controls
+            // Chat Layout: Same as IDE - file previews at top, controls at bottom
             <>
-              <div className="chat-main-row">
-                {/* Left Side - Plus, Model, and File Previews */}
-                <div className="chat-left-section">
-                  {/* File Previews - Above the controls */}
-                  {attachedFiles.length > 0 && (
-                    <div className="file-previews-chat">
-                      {attachedFiles.map((file, index) => (
-                        <div key={index} className="file-preview-small">
-                          {file.type === 'image' && file.preview ? (
-                            <img src={file.preview} alt={file.file.name} className="preview-image-small" />
-                          ) : (
-                            <div className="preview-document-small">
-                              <FileText size={12} />
-                            </div>
-                          )}
-                          <button
-                            type="button"
-                            className="remove-file-btn-small"
-                            onClick={() => handleRemoveFile(index)}
-                            title="Remove file"
-                          >
-                            <X size={8} />
-                          </button>
-                          {/* Hover Preview */}
-                          <div className="file-preview-hover">
-                            {file.type === 'image' && file.preview ? (
-                              <img src={file.preview} alt={file.file.name} className="preview-image-large" />
-                            ) : (
-                              <div className="preview-document-large">
-                                <FileText size={48} />
-                                <span className="file-name-large">{file.file.name}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Bottom Controls */}
-                  <div className="chat-left-controls">
-                    {/* Plus Button */}
-                    <div className="control-group">
-                      <button
-                        type="button"
-                        className="control-button"
-                        onClick={handleAttachmentClick}
-                        title="Add attachment"
-                      >
-                        <Plus size={14} />
-                      </button>
-                      {showAttachmentMenu && (
-                        <div className="dropdown-menu attachment-menu">
-                          <button 
-                            type="button"
-                            className="dropdown-item" 
-                            onClick={() => handleSelectAttachment('image')}
-                          >
-                            Image
-                          </button>
-                          <button 
-                            type="button"
-                            className="dropdown-item" 
-                            onClick={() => handleSelectAttachment('document')}
-                          >
-                            Document
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Model Selector */}
-                    <div className="control-group">
-                      <button
-                        type="button"
-                        className="control-button model-button"
-                        onClick={handleModelClick}
-                        title="Select model"
-                      >
-                        <span className="model-name">{selectedModel}</span>
-                        <ChevronDown size={12} />
-                      </button>
-                      {showModelMenu && (
-                        <div className="dropdown-menu model-menu">
-                          <button 
-                            type="button"
-                            className="dropdown-item" 
-                            onClick={() => handleSelectModel('Gemini')}
-                          >
-                            Gemini
-                          </button>
-                          <button 
-                            type="button"
-                            className="dropdown-item" 
-                            onClick={() => handleSelectModel('GPT-4')}
-                          >
-                            GPT-4
-                          </button>
-                          <button 
-                            type="button"
-                            className="dropdown-item" 
-                            onClick={() => handleSelectModel('Claude')}
-                          >
-                            Claude
-                          </button>
+              {/* File Previews - At the top */}
+              <div className="file-previews-top">
+                {attachedFiles.map((file, index) => (
+                  <div key={index} className="file-preview-small">
+                    {file.type === 'image' && file.preview ? (
+                      <img src={file.preview} alt={file.file.name} className="preview-image-small" />
+                    ) : (
+                      <div className="preview-document-small">
+                        <FileText size={12} />
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className="remove-file-btn-small"
+                      onClick={() => handleRemoveFile(index)}
+                      title="Remove file"
+                    >
+                      <X size={8} />
+                    </button>
+                    {/* Hover Preview */}
+                    <div className="file-preview-hover">
+                      {file.type === 'image' && file.preview ? (
+                        <img src={file.preview} alt={file.file.name} className="preview-image-large" />
+                      ) : (
+                        <div className="preview-document-large">
+                          <FileText size={48} />
+                          <span className="file-name-large">{file.file.name}</span>
                         </div>
                       )}
                     </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Textarea - In the middle */}
+              <textarea
+                ref={inputRef}
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Type your message... (Shift+Enter for new line)"
+                className="input-textarea"
+                rows={1}
+                disabled={isLoading}
+              />
+
+              {/* Bottom Controls Row */}
+              <div className="bottom-controls">
+                {/* Left Side - Plus and Model */}
+                <div className="left-controls">
+                  {/* Plus Button */}
+                  <div className="control-group">
+                    <button
+                      type="button"
+                      className="control-button"
+                      onClick={handleAttachmentClick}
+                      title="Add attachment"
+                    >
+                      <Plus size={16} />
+                    </button>
+                    {showAttachmentMenu && (
+                      <div className="dropdown-menu attachment-menu">
+                        <button 
+                          type="button"
+                          className="dropdown-item" 
+                          onClick={() => handleSelectAttachment('image')}
+                        >
+                          Image
+                        </button>
+                        <button 
+                          type="button"
+                          className="dropdown-item" 
+                          onClick={() => handleSelectAttachment('document')}
+                        >
+                          Document
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Model Selector */}
+                  <div className="control-group">
+                    <button
+                      type="button"
+                      className="control-button model-button"
+                      onClick={handleModelClick}
+                      title="Select model"
+                    >
+                      <span className="model-name">{selectedModel}</span>
+                      <ChevronDown size={12} />
+                    </button>
+                    {showModelMenu && (
+                      <div className="dropdown-menu model-menu">
+                        <button 
+                          type="button"
+                          className="dropdown-item" 
+                          onClick={() => handleSelectModel('Gemini')}
+                        >
+                          Gemini
+                        </button>
+                        <button 
+                          type="button"
+                          className="dropdown-item" 
+                          onClick={() => handleSelectModel('GPT-4')}
+                        >
+                          GPT-4
+                        </button>
+                        <button 
+                          type="button"
+                          className="dropdown-item" 
+                          onClick={() => handleSelectModel('Claude')}
+                        >
+                          Claude
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {/* Textarea in the middle */}
-                <textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Type your message... (Shift+Enter for new line)"
-                  className="input-textarea"
-                  rows={1}
-                  disabled={isLoading}
-                />
-
                 {/* Right Side - Mic and Send */}
-                <div className="chat-right-controls">
+                <div className="right-controls">
                   {/* Mic Button */}
                   <button
                     type="button"
@@ -500,7 +496,7 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
                     onClick={handleMicClick}
                     title={isRecording ? "Stop recording" : "Start voice recording"}
                   >
-                    <Mic size={20} />
+                    <Mic size={18} />
                   </button>
 
                   {/* Send Button */}
