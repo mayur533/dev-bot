@@ -44,7 +44,14 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
           folderPath: projectPath
         });
         
-        console.log("Loaded file tree:", tree);
+        console.log("Loaded file tree with", tree?.length || 0, "items");
+        
+        if (!tree || tree.length === 0) {
+          console.warn("File tree is empty");
+          setFileTree([]);
+          setIsLoading(false);
+          return;
+        }
         
         // Set all folders to be collapsed initially
         const setInitialExpanded = (nodes: FileNode[]): FileNode[] => {
@@ -55,12 +62,15 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize }:
           }));
         };
         
-        setFileTree(setInitialExpanded(tree));
+        const collapsedTree = setInitialExpanded(tree);
+        console.log("Setting file tree with collapsed folders");
+        setFileTree(collapsedTree);
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to load file tree:", error);
-        alert(`Failed to load project files: ${error}\n\nPath: ${projectPath}`);
-      } finally {
+        console.error("Error details:", JSON.stringify(error));
         setIsLoading(false);
+        alert(`Failed to load project files: ${error}\n\nPath: ${projectPath}`);
       }
     };
     
