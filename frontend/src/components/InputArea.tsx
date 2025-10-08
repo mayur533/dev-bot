@@ -43,6 +43,13 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
     // Set height to content height, but cap at 10 lines
     const newHeight = Math.min(e.target.scrollHeight, maxHeight);
     e.target.style.height = newHeight + "px";
+    
+    // Ensure overflow is set to auto when content exceeds 10 lines
+    if (e.target.scrollHeight > maxHeight) {
+      e.target.style.overflowY = "auto";
+    } else {
+      e.target.style.overflowY = "hidden";
+    }
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -165,6 +172,13 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
       
       // Set initial height
       textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
+      
+      // Ensure overflow is set correctly
+      if (textarea.scrollHeight > maxHeight) {
+        textarea.style.overflowY = "auto";
+      } else {
+        textarea.style.overflowY = "hidden";
+      }
     }
   }, [compact]);
 

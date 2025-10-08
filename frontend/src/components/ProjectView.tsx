@@ -13,6 +13,7 @@ interface ProjectViewProps {
   onSendMessage: (message: string) => void;
   onEditMessage: (messageId: string, newContent: string) => void;
   onRetryMessage: (messageId: string) => void;
+  onBackToChat: () => void;
 }
 
 interface OpenFile {
@@ -29,7 +30,8 @@ function ProjectView({
   isLoading,
   onSendMessage,
   onEditMessage,
-  onRetryMessage 
+  onRetryMessage,
+  onBackToChat
 }: ProjectViewProps) {
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
@@ -145,6 +147,7 @@ function ProjectView({
               onToggleExplorer={() => setShowExplorer(!showExplorer)}
               onToggleChat={() => setShowChat(!showChat)}
               onToggleTerminal={() => setShowTerminal(!showTerminal)}
+              onBackToChat={onBackToChat}
             />
           </div>
           {showTerminal && (

@@ -20,6 +20,7 @@ interface CodeEditorProps {
   onToggleExplorer: () => void;
   onToggleChat: () => void;
   onToggleTerminal: () => void;
+  onBackToChat: () => void;
 }
 
 function CodeEditor({ 
@@ -33,7 +34,8 @@ function CodeEditor({
   showTerminal,
   onToggleExplorer,
   onToggleChat,
-  onToggleTerminal
+  onToggleTerminal,
+  onBackToChat
 }: CodeEditorProps) {
   
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -46,6 +48,14 @@ function CodeEditor({
     <div className="code-editor">
       {/* File Tabs with Toggle Buttons */}
       <div className="editor-tabs">
+        <button 
+          className="close-ide-btn" 
+          onClick={onBackToChat}
+          title="Close IDE"
+        >
+          💬 Close IDE
+        </button>
+        
         <div className="tabs-container">
           {openFiles.length === 0 ? (
             <div className="no-tabs">No files open</div>

@@ -208,6 +208,26 @@ function App() {
     await simulateAPIResponse(userMessageContent);
   };
 
+  // Back to chat from project view
+  const handleBackToChat = () => {
+    // Switch to the first chat tab or create a new one
+    const chatTabs = tabs.filter(tab => tab.type === "chat");
+    if (chatTabs.length > 0) {
+      setActiveTabId(chatTabs[0].id);
+    } else {
+      // Create a new chat tab
+      const newChatTab: ChatTab = {
+        id: `chat-${Date.now()}`,
+        type: "chat",
+        title: "New Chat",
+        messages: [],
+        createdAt: new Date()
+      };
+      setTabs([...tabs, newChatTab]);
+      setActiveTabId(newChatTab.id);
+    }
+  };
+
   // Simulate API response with streaming
   const simulateAPIResponse = async (userInput: string) => {
     const assistantMessageId = (Date.now() + Math.random() * 1000).toString();
@@ -596,6 +616,7 @@ app.listen(PORT, () => {
           onSendMessage={handleSendMessage}
           onEditMessage={handleEditMessage}
           onRetryMessage={handleRetryMessage}
+          onBackToChat={handleBackToChat}
         />
       ) : (
         // Regular Chat View

@@ -274,16 +274,25 @@
   min-height: 52px;
   font-size: 0.875rem;
   padding: 0.5rem;
+  overflow-y: auto;
 }
 
-/* Hide scrollbars completely */
+/* Show scrollbar when content overflows */
 .input-textarea::-webkit-scrollbar {
-  display: none;
+  width: 6px;
 }
 
-.input-textarea {
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
-  scrollbar-width: none;  /* Firefox */
+.input-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.input-textarea::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.input-textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
 .input-textarea:focus {
