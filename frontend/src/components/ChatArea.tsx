@@ -6,9 +6,11 @@ import "./ChatArea.css";
 interface ChatAreaProps {
   messages: Message[];
   isLoading: boolean;
+  onEditMessage?: (messageId: string, newContent: string) => void;
+  onRetryMessage?: (messageId: string) => void;
 }
 
-function ChatArea({ messages, isLoading }: ChatAreaProps) {
+function ChatArea({ messages, isLoading, onEditMessage, onRetryMessage }: ChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatAreaRef = useRef<HTMLDivElement>(null);
   const [isUserScrolling, setIsUserScrolling] = useState(false);
@@ -59,7 +61,7 @@ function ChatArea({ messages, isLoading }: ChatAreaProps) {
       ) : (
         <div className="messages">
           {messages.map((message) => (
-            <MessageBlock key={message.id} message={message} />
+            <MessageBlock key={message.id} message={message} onEdit={onEditMessage} onRetry={onRetryMessage} />
           ))}
           {isLoading && (
             <div className="loading-indicator">

@@ -74,8 +74,6 @@
   display: flex;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background-color: var(--assistant-message-bg);
-  border-radius: 1.5rem;
 }
 
 .loading-dots span {

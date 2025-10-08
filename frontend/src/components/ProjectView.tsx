@@ -1,0 +1,146 @@
+import { useState } from "react";
+import FileExplorer from "./FileExplorer";
+import CodeEditor from "./CodeEditor";
+import ChatSidebar from "./ChatSidebar";
+import { Message } from "../types";
+import "./ProjectView.css";
+
+interface ProjectViewProps {
+  projectPath: string;
+  projectName: string;
+  messages: Message[];
+  isLoading: boolean;
+  onSendMessage: (message: string) => void;
+  onEditMessage: (messageId: string, newContent: string) => void;
+  onRetryMessage: (messageId: string) => void;
+}
+
+interface OpenFile {
+  path: string;
+  name: string;
+  content: string;
+  language: string;
+}
+
+function ProjectView({ 
+  projectPath, 
+  projectName, 
+  messages, 
+  isLoading,
+  onSendMessage,
+  onEditMessage,
+  onRetryMessage 
+}: ProjectViewProps) {
+  const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
+  const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
+  const [explorerWidth, setExplorerWidth] = useState(250);
+  const [chatWidth, setChatWidth] = useState(350);
+
+  const handleFileOpen = async (filePath: string, fileName: string) => {
+    // Check if file is already open
+    const existingFile = openFiles.find(f => f.path === filePath);
+    if (existingFile) {
+      setActiveFilePath(filePath);
+      return;
+    }
+
+    try {
+      let fileContent = `// File: ${fileName}\n// Path: ${filePath}\n\n// File content will be loaded here`;
+      
+      // Check if we're running in Tauri
+      const isTauri = (window as any).__TAURI__;
+      
+      if (isTauri) {
+        const { invoke } = await import("@tauri-apps/api/core");
+        fileContent = await invoke<string>("read_file_content", {
+          filePath: filePath
+        });
+      }
+
+      const fileExtension = fileName.split('.').pop() || '';
+      const language = getLanguageFromExtension(fileExtension);
+
+      const newFile: OpenFile = {
+        path: filePath,
+        name: fileName,
+        content: fileContent,
+        language
+      };
+
+      setOpenFiles([...openFiles, newFile]);
+      setActiveFilePath(filePath);
+    } catch (error) {
+      console.error("Failed to open file:", error);
+      alert(`Failed to open file: ${error}`);
+    }
+  };
+
+  const handleFileClose = (filePath: string) => {
+    setOpenFiles(openFiles.filter(f => f.path !== filePath));
+    if (activeFilePath === filePath && openFiles.length > 1) {
+      const remainingFiles = openFiles.filter(f => f.path !== filePath);
+      setActiveFilePath(remainingFiles[0]?.path || null);
+    } else if (openFiles.length === 1) {
+      setActiveFilePath(null);
+    }
+  };
+
+  const handleFileChange = (filePath: string, newContent: string) => {
+    setOpenFiles(openFiles.map(f => 
+      f.path === filePath ? { ...f, content: newContent } : f
+    ));
+  };
+
+  const getLanguageFromExtension = (ext: string): string => {
+    const langMap: Record<string, string> = {
+      'ts': 'typescript',
+      'tsx': 'typescript',
+      'js': 'javascript',
+      'jsx': 'javascript',
+      'py': 'python',
+      'rs': 'rust',
+      'go': 'go',
+      'java': 'java',
+      'cpp': 'cpp',
+      'c': 'c',
+      'css': 'css',
+      'html': 'html',
+      'json': 'json',
+      'md': 'markdown',
+    };
+    return langMap[ext] || 'text';
+  };
+
+  const activeFile = openFiles.find(f => f.path === activeFilePath);
+
+  return (
+    <div className="project-view">
+      <FileExplorer
+        projectPath={projectPath}
+        projectName={projectName}
+        width={explorerWidth}
+        onFileOpen={handleFileOpen}
+        onResize={setExplorerWidth}
+      />
+      <CodeEditor
+        openFiles={openFiles}
+        activeFile={activeFile}
+        onFileSelect={setActiveFilePath}
+        onFileClose={handleFileClose}
+        onFileChange={handleFileChange}
+      />
+      <ChatSidebar
+        messages={messages}
+        isLoading={isLoading}
+        width={chatWidth}
+        onSendMessage={onSendMessage}
+        onEditMessage={onEditMessage}
+        onRetryMessage={onRetryMessage}
+        onResize={setChatWidth}
+      />
+    </div>
+  );
+}
+
+export default ProjectView;
+

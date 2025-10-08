@@ -6,6 +6,7 @@ import ChatArea from "./components/ChatArea";
 import InputArea from "./components/InputArea";
 import ProjectDialog from "./components/ProjectDialog";
 import OpenProjectDialog from "./components/OpenProjectDialog";
+import ProjectView from "./components/ProjectView";
 import "./App.css";
 
 // Sample data generator
@@ -132,6 +133,79 @@ function App() {
 
     // Simulate API call with different response types
     await simulateAPIResponse(content);
+  };
+
+  // Edit message
+  const handleEditMessage = async (messageId: string, newContent: string) => {
+    // Find the message index
+    const activeTabData = tabs.find(tab => tab.id === activeTabId);
+    if (!activeTabData) return;
+
+    const messageIndex = activeTabData.messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1) return;
+
+    // Update the message content and remove all messages after it
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === activeTabId
+          ? {
+              ...tab,
+              messages: tab.messages
+                .slice(0, messageIndex + 1)
+                .map((msg) =>
+                  msg.id === messageId
+                    ? { ...msg, content: newContent }
+                    : msg
+                ),
+            }
+          : tab
+      )
+    );
+
+    // Trigger new API response with updated content
+    setIsLoading(true);
+    await simulateAPIResponse(newContent);
+  };
+
+  // Retry message
+  const handleRetryMessage = async (messageId: string) => {
+    // Find the message index
+    const activeTabData = tabs.find(tab => tab.id === activeTabId);
+    if (!activeTabData) return;
+
+    const messageIndex = activeTabData.messages.findIndex(msg => msg.id === messageId);
+    if (messageIndex === -1 || messageIndex === 0) return;
+
+    // The message should be an assistant message, find the previous user message
+    const assistantMessage = activeTabData.messages[messageIndex];
+    if (assistantMessage.role !== "assistant") return;
+
+    // Find the previous user message
+    let userMessageContent = "";
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (activeTabData.messages[i].role === "user") {
+        userMessageContent = activeTabData.messages[i].content;
+        break;
+      }
+    }
+
+    if (!userMessageContent) return;
+
+    // Remove the current assistant response
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === activeTabId
+          ? {
+              ...tab,
+              messages: tab.messages.filter((msg) => msg.id !== messageId),
+            }
+          : tab
+      )
+    );
+
+    // Trigger new API response with the same query
+    setIsLoading(true);
+    await simulateAPIResponse(userMessageContent);
   };
 
   // Simulate API response with streaming
@@ -512,24 +586,45 @@ app.listen(PORT, () => {
 
   return (
     <div className="app">
-      <Sidebar
-        tabs={filteredTabs}
-        activeTabId={activeTabId}
-        onTabSelect={setActiveTabId}
-        onNewTab={handleNewTab}
-        onDeleteTab={handleDeleteTab}
-        collapsed={sidebarCollapsed}
-        onToggle={toggleSidebar}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onCreateProject={handleCreateProject}
-        onOpenProject={handleOpenProject}
-      />
-      <div className="main-content">
-        <Header title={activeTab?.title || "New Chat"} />
-        <ChatArea messages={activeTab?.messages || []} isLoading={isLoading} />
-        <InputArea onSendMessage={handleSendMessage} isLoading={isLoading} />
-      </div>
+      {activeTab?.type === "project" ? (
+        // Project View - VSCode-like interface
+        <ProjectView
+          projectPath={activeTab.projectPath || ""}
+          projectName={activeTab.title}
+          messages={activeTab.messages}
+          isLoading={isLoading}
+          onSendMessage={handleSendMessage}
+          onEditMessage={handleEditMessage}
+          onRetryMessage={handleRetryMessage}
+        />
+      ) : (
+        // Regular Chat View
+        <>
+          <Sidebar
+            tabs={filteredTabs}
+            activeTabId={activeTabId}
+            onTabSelect={setActiveTabId}
+            onNewTab={handleNewTab}
+            onDeleteTab={handleDeleteTab}
+            collapsed={sidebarCollapsed}
+            onToggle={toggleSidebar}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onCreateProject={handleCreateProject}
+            onOpenProject={handleOpenProject}
+          />
+          <div className="main-content">
+            <Header title={activeTab?.title || "New Chat"} />
+            <ChatArea 
+              messages={activeTab?.messages || []} 
+              isLoading={isLoading} 
+              onEditMessage={handleEditMessage}
+              onRetryMessage={handleRetryMessage}
+            />
+            <InputArea onSendMessage={handleSendMessage} isLoading={isLoading} />
+          </div>
+        </>
+      )}
       
       <ProjectDialog
         isOpen={showProjectDialog}

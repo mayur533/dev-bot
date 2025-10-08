@@ -40,7 +40,14 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
         });
         
         if (selected) {
-          setProjectPath(selected as string);
+          const selectedPath = selected as string;
+          setProjectPath(selectedPath);
+          
+          // Auto-submit when folder is selected
+          const pathParts = selectedPath.split(/[/\\]/);
+          const projectName = pathParts[pathParts.length - 1] || "Project";
+          onOpenProject(selectedPath, projectName);
+          onClose();
         }
       }
     } catch (error) {
@@ -57,7 +64,7 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
     <div className="dialog-overlay" onClick={onClose}>
       <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h2 className="dialog-title">Open Existing Project</h2>
+          <h2 className="dialog-title">Open Project</h2>
           <button className="dialog-close" onClick={onClose}>
             ✕
           </button>
@@ -66,7 +73,7 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
         <form onSubmit={handleSubmit} className="dialog-form">
           <div className="form-group">
             <label htmlFor="projectPath" className="form-label">
-              Project Location
+              Select Project Folder
             </label>
             <div className="path-input-group">
               <input
@@ -74,35 +81,27 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
                 type="text"
                 value={projectPath}
                 onChange={(e) => setProjectPath(e.target.value)}
-                placeholder="Select or enter project location..."
+                placeholder="Click Browse to select a folder..."
                 className="form-input path-input"
-                required
-                autoFocus
+                readOnly
               />
               <button
                 type="button"
                 onClick={handleSelectPath}
-                className="path-select-btn"
+                className="path-select-btn primary-btn"
                 disabled={isSelectingPath}
               >
-                {isSelectingPath ? "..." : "📁 Browse"}
+                {isSelectingPath ? "Opening..." : "📁 Browse"}
               </button>
             </div>
             <small className="form-help">
-              Select the folder containing your existing project
+              Click Browse to select your project folder
             </small>
           </div>
 
           <div className="dialog-actions">
             <button type="button" onClick={onClose} className="btn btn-secondary">
               Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn btn-primary"
-              disabled={!projectPath.trim()}
-            >
-              Open Project
             </button>
           </div>
         </form>
