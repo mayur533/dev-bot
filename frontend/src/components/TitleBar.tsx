@@ -34,14 +34,25 @@ function TitleBar() {
     }
   };
 
-  const handleMaximize = async () => {
+  const handleMaximize = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Maximize button clicked");
     try {
       const appWindow = getCurrentWindow();
+      console.log("Current window obtained:", appWindow);
+      console.log("Before maximize, isMaximized:", isMaximized);
       await appWindow.toggleMaximize();
-      const maximized = await appWindow.isMaximized();
-      setIsMaximized(maximized);
+      console.log("toggleMaximize called");
+      // Small delay to ensure state updates
+      setTimeout(async () => {
+        const maximized = await appWindow.isMaximized();
+        console.log("After maximize, isMaximized:", maximized);
+        setIsMaximized(maximized);
+      }, 100);
     } catch (error) {
       console.error("Failed to toggle maximize:", error);
+      console.error("Error details:", JSON.stringify(error));
     }
   };
 

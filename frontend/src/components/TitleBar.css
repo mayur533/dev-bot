@@ -70,6 +70,8 @@
   cursor: pointer;
   transition: background-color 0.2s;
   padding: 0;
+  position: relative;
+  z-index: 10;
   /* Ensure buttons don't interfere with clicking */
   -webkit-app-region: no-drag;
   app-region: no-drag;
