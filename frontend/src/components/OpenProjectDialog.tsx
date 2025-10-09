@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import "./OpenProjectDialog.css";
 
 interface OpenProjectDialogProps {
@@ -10,17 +11,41 @@ interface OpenProjectDialogProps {
 function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialogProps) {
   const [projectPath, setProjectPath] = useState("");
   const [isSelectingPath, setIsSelectingPath] = useState(false);
+  const [error, setError] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (projectPath.trim()) {
-      // Extract project name from path
-      const pathParts = projectPath.split(/[/\\]/);
-      const projectName = pathParts[pathParts.length - 1] || "Project";
-      
-      onOpenProject(projectPath.trim(), projectName);
-      setProjectPath("");
-      onClose();
+    
+    if (!projectPath.trim()) {
+      setError("Please enter or select a project folder");
+      return;
+    }
+
+    setIsValidating(true);
+    setError("");
+
+    try {
+      // Validate the folder path using Tauri command
+      const isValid = await invoke<boolean>("validate_project_folder", {
+        projectPath: projectPath.trim()
+      });
+
+      if (isValid) {
+        // Extract project name from path
+        const pathParts = projectPath.split(/[/\\]/);
+        const projectName = pathParts[pathParts.length - 1] || "Project";
+        
+        onOpenProject(projectPath.trim(), projectName);
+        setProjectPath("");
+        setError("");
+        onClose();
+      }
+    } catch (err) {
+      // Handle validation error
+      setError(typeof err === 'string' ? err : "Invalid folder path. Please check and try again.");
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -78,17 +103,20 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
         <form onSubmit={handleSubmit} className="dialog-form">
           <div className="form-group">
             <label htmlFor="projectPath" className="form-label">
-              Select Project Folder
+              Project Folder
             </label>
             <div className="path-input-group">
               <input
                 id="projectPath"
                 type="text"
                 value={projectPath}
-                onChange={(e) => setProjectPath(e.target.value)}
-                placeholder="Click Browse to select a folder..."
-                className="form-input path-input"
-                readOnly
+                onChange={(e) => {
+                  setProjectPath(e.target.value);
+                  setError(""); // Clear error when user types
+                }}
+                placeholder="Enter or browse for project folder..."
+                className={`form-input path-input ${error ? 'input-error' : ''}`}
+                required
               />
               <button
                 type="button"
@@ -99,14 +127,22 @@ function OpenProjectDialog({ isOpen, onClose, onOpenProject }: OpenProjectDialog
                 {isSelectingPath ? "Opening..." : "📁 Browse"}
               </button>
             </div>
+            {error && <div className="error-message">{error}</div>}
             <small className="form-help">
-              Click Browse to select your project folder
+              Enter the path manually or click Browse to select your project folder
             </small>
           </div>
 
           <div className="dialog-actions">
             <button type="button" onClick={onClose} className="btn btn-secondary">
               Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={!projectPath.trim() || isValidating}
+            >
+              {isValidating ? "Validating..." : "Open Project"}
             </button>
           </div>
         </form>
