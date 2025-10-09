@@ -13,7 +13,7 @@
 }
 
 .explorer-header {
-  padding: 0.5rem 0.75rem;
+  padding: 0;
   border-bottom: 1px solid var(--border-color);
   background-color: var(--bg-secondary);
   min-height: 36px;
@@ -28,6 +28,7 @@
   color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  display: none; /* Hide the title text */
 }
 
 .close-ide-btn {

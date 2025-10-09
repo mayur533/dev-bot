@@ -63,9 +63,17 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize, o
           }));
         };
         
-        const collapsedTree = setInitialExpanded(tree);
-        console.log("Setting file tree with collapsed folders");
-        setFileTree(collapsedTree);
+        // Create a root folder node for the selected project folder
+        const rootNode: FileNode = {
+          name: projectName,
+          path: projectPath,
+          type: 'folder',
+          expanded: true, // Start expanded to show contents
+          children: setInitialExpanded(tree)
+        };
+        
+        console.log("Setting file tree with root folder:", projectName);
+        setFileTree([rootNode]); // Wrap in array to show as root
         setIsLoading(false);
       } catch (error) {
         console.error("Failed to load file tree:", error);
@@ -76,7 +84,7 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize, o
     };
     
     loadFileTree();
-  }, [projectPath]);
+  }, [projectPath, projectName]);
 
   const toggleFolder = (path: string) => {
     const updateTree = (nodes: FileNode[]): FileNode[] => {
