@@ -87,12 +87,7 @@
   flex-shrink: 0;
 }
 
-/* Add padding to app content to account for titlebar */
-.app-with-titlebar {
-  padding-top: 32px;
-  height: 100vh;
-  box-sizing: border-box;
-}
+/* The app-with-titlebar class is now defined in App.css for better organization */
 
 /* Dark mode adjustments */
 @media (prefers-color-scheme: dark) {

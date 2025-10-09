@@ -122,6 +122,13 @@ body {
   height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* When titlebar is present, adjust for its height */
+.app.app-with-titlebar {
+  height: calc(100vh - 32px);
+  margin-top: 32px;
 }
 
 .main-content {
@@ -129,6 +136,7 @@ body {
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 /* ========================================
