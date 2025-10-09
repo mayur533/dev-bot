@@ -164,13 +164,6 @@ function FileExplorer({ projectPath, projectName, width, onFileOpen, onResize, o
     <div className="file-explorer" style={{ width: `${width}px` }}>
       <div className="explorer-header">
         <span className="explorer-title">{projectName}</span>
-        <button 
-          className="close-ide-btn" 
-          onClick={onBackToChat}
-          title="Close IDE"
-        >
-          💬 Close IDE
-        </button>
       </div>
       <div className="explorer-content">
         {isLoading ? (
