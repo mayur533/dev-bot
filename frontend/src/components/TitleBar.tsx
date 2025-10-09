@@ -66,7 +66,7 @@ function TitleBar() {
   };
 
   return (
-    <div className="titlebar" data-tauri-drag-region onDoubleClick={handleDoubleClick}>
+    <div className="titlebar" data-tauri-drag-region="true" onDoubleClick={handleDoubleClick}>
       <div className="titlebar-left" data-tauri-drag-region="true">
         <div className="titlebar-icon">
           <img src="/vite.svg" alt="App Icon" className="app-icon" />
