@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChatTab, Message } from "./types";
+import TitleBar from "./components/TitleBar";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import ChatArea from "./components/ChatArea";
@@ -225,7 +226,7 @@ function App() {
         type: "chat",
         title: "New Chat",
         messages: [],
-        createdAt: new Date()
+        createdAt: Date.now()
       };
       setTabs([...tabs, newChatTab]);
       setActiveTabId(newChatTab.id);
@@ -609,65 +610,68 @@ app.listen(PORT, () => {
   };
 
   return (
-    <div className="app">
-      {activeTab?.type === "project" ? (
-        // Project View - VSCode-like interface
-        <ProjectView
-          projectPath={activeTab.projectPath || ""}
-          projectName={activeTab.title}
-          messages={activeTab.messages}
-          isLoading={isLoading}
-          onSendMessage={handleSendMessage}
-          onEditMessage={handleEditMessage}
-          onRetryMessage={handleRetryMessage}
-          onBackToChat={handleBackToChat}
-          contextUsed={contextUsed}
-        />
-      ) : (
-        // Regular Chat View
-        <>
-          <Sidebar
-            tabs={filteredTabs}
-            activeTabId={activeTabId}
-            onTabSelect={setActiveTabId}
-            onNewTab={handleNewTab}
-            onDeleteTab={handleDeleteTab}
-            collapsed={sidebarCollapsed}
-            onToggle={toggleSidebar}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onCreateProject={handleCreateProject}
-            onOpenProject={handleOpenProject}
+    <>
+      <TitleBar />
+      <div className="app app-with-titlebar">
+        {activeTab?.type === "project" ? (
+          // Project View - VSCode-like interface
+          <ProjectView
+            projectPath={activeTab.projectPath || ""}
+            projectName={activeTab.title}
+            messages={activeTab.messages}
+            isLoading={isLoading}
+            onSendMessage={handleSendMessage}
+            onEditMessage={handleEditMessage}
+            onRetryMessage={handleRetryMessage}
+            onBackToChat={handleBackToChat}
+            contextUsed={contextUsed}
           />
-          <div className="main-content">
-            <Header title={activeTab?.title || "New Chat"} />
-            <ChatArea 
-              messages={activeTab?.messages || []} 
-              isLoading={isLoading} 
-              onEditMessage={handleEditMessage}
-              onRetryMessage={handleRetryMessage}
+        ) : (
+          // Regular Chat View
+          <>
+            <Sidebar
+              tabs={filteredTabs}
+              activeTabId={activeTabId}
+              onTabSelect={setActiveTabId}
+              onNewTab={handleNewTab}
+              onDeleteTab={handleDeleteTab}
+              collapsed={sidebarCollapsed}
+              onToggle={toggleSidebar}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onCreateProject={handleCreateProject}
+              onOpenProject={handleOpenProject}
             />
-            <InputArea 
-              onSendMessage={handleSendMessage} 
-              isLoading={isLoading} 
-              contextUsed={contextUsed}
-            />
-          </div>
-        </>
-      )}
-      
-      <ProjectDialog
-        isOpen={showProjectDialog}
-        onClose={() => setShowProjectDialog(false)}
-        onCreateProject={handleProjectCreate}
-      />
-      
-      <OpenProjectDialog
-        isOpen={showOpenProjectDialog}
-        onClose={() => setShowOpenProjectDialog(false)}
-        onOpenProject={handleProjectOpen}
-      />
-    </div>
+            <div className="main-content">
+              <Header title={activeTab?.title || "New Chat"} />
+              <ChatArea 
+                messages={activeTab?.messages || []} 
+                isLoading={isLoading} 
+                onEditMessage={handleEditMessage}
+                onRetryMessage={handleRetryMessage}
+              />
+              <InputArea 
+                onSendMessage={handleSendMessage} 
+                isLoading={isLoading} 
+                contextUsed={contextUsed}
+              />
+            </div>
+          </>
+        )}
+        
+        <ProjectDialog
+          isOpen={showProjectDialog}
+          onClose={() => setShowProjectDialog(false)}
+          onCreateProject={handleProjectCreate}
+        />
+        
+        <OpenProjectDialog
+          isOpen={showOpenProjectDialog}
+          onClose={() => setShowOpenProjectDialog(false)}
+          onOpenProject={handleProjectOpen}
+        />
+      </div>
+    </>
   );
 }
 

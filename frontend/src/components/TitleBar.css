@@ -1,0 +1,103 @@
+/* ========================================
+   Custom TitleBar Styles
+   ======================================== */
+
+.titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  user-select: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  padding: 0 0.5rem;
+}
+
+.titlebar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  /* Allow dragging from the left section */
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+.titlebar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
+.app-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.titlebar-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.titlebar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+  /* Prevent dragging from control buttons */
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 0;
+  /* Ensure buttons don't interfere with clicking */
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-button:hover {
+  background-color: var(--bg-secondary);
+}
+
+.titlebar-button.close-button:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.titlebar-button svg {
+  flex-shrink: 0;
+}
+
+/* Add padding to app content to account for titlebar */
+.app-with-titlebar {
+  padding-top: 32px;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .titlebar {
+    background-color: var(--bg-primary);
+  }
+}
+
