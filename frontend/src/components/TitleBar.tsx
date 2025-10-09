@@ -124,28 +124,28 @@ function TitleBar({
         {isIDEMode && (
           <div className="titlebar-ide-controls">
             <button
-              className="titlebar-ide-button"
+              className={`titlebar-ide-button ${showExplorer ? 'panel-active' : ''}`}
               onClick={onToggleExplorer}
               title="Toggle File Explorer"
               type="button"
             >
-              {showExplorer ? <PanelLeft size={16} fill="currentColor" /> : <PanelLeft size={16} />}
+              <PanelLeft size={16} />
             </button>
             <button
-              className="titlebar-ide-button"
+              className={`titlebar-ide-button ${showChat ? 'panel-active' : ''}`}
               onClick={onToggleChat}
               title="Toggle Chat Sidebar"
               type="button"
             >
-              {showChat ? <PanelRight size={16} fill="currentColor" /> : <PanelRight size={16} />}
+              <PanelRight size={16} />
             </button>
             <button
-              className="titlebar-ide-button"
+              className={`titlebar-ide-button ${showTerminal ? 'panel-active' : ''}`}
               onClick={onToggleTerminal}
               title="Toggle Terminal"
               type="button"
             >
-              {showTerminal ? <Terminal size={16} fill="currentColor" /> : <Terminal size={16} />}
+              <Terminal size={16} />
             </button>
             <button
               className="titlebar-ide-button"

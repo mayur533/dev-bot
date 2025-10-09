@@ -79,6 +79,25 @@
   color: var(--text-primary);
 }
 
+/* Panel active state - only show visual indicator, not fill whole icon */
+.titlebar-ide-button.panel-active {
+  color: var(--text-primary);
+  position: relative;
+}
+
+/* Add a subtle indicator bar below the icon when panel is active */
+.titlebar-ide-button.panel-active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background-color: var(--button-bg);
+  border-radius: 1px;
+}
+
 /* Back button - on the left side */
 .titlebar-ide-button.back-button {
   margin-right: 0.5rem;
