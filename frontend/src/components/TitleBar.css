@@ -48,6 +48,46 @@
   color: var(--text-primary);
 }
 
+/* IDE Mode Controls */
+.titlebar-ide-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-ide-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 0.25rem;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.titlebar-ide-button:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Back button - on the left side */
+.titlebar-ide-button.back-button {
+  margin-right: 0.5rem;
+}
+
+.titlebar-ide-button svg {
+  flex-shrink: 0;
+}
+
 .titlebar-controls {
   display: flex;
   align-items: center;

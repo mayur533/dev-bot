@@ -80,6 +80,11 @@ function App() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showOpenProjectDialog, setShowOpenProjectDialog] = useState(false);
   const [contextUsed, setContextUsed] = useState(0);
+  
+  // IDE state (passed from ProjectView)
+  const [ideShowExplorer, setIdeShowExplorer] = useState(true);
+  const [ideShowChat, setIdeShowChat] = useState(true);
+  const [ideShowTerminal, setIdeShowTerminal] = useState(false);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
@@ -609,9 +614,24 @@ app.listen(PORT, () => {
     }
   };
 
+  const handleSettings = () => {
+    console.log("Settings clicked");
+    // TODO: Implement settings dialog
+  };
+
   return (
     <>
-      <TitleBar />
+      <TitleBar 
+        isIDEMode={activeTab?.type === "project"}
+        showExplorer={ideShowExplorer}
+        showChat={ideShowChat}
+        showTerminal={ideShowTerminal}
+        onToggleExplorer={() => setIdeShowExplorer(!ideShowExplorer)}
+        onToggleChat={() => setIdeShowChat(!ideShowChat)}
+        onToggleTerminal={() => setIdeShowTerminal(!ideShowTerminal)}
+        onCloseIDE={handleBackToChat}
+        onSettings={handleSettings}
+      />
       <div className="app app-with-titlebar">
         {activeTab?.type === "project" ? (
           // Project View - VSCode-like interface
@@ -625,6 +645,12 @@ app.listen(PORT, () => {
             onRetryMessage={handleRetryMessage}
             onBackToChat={handleBackToChat}
             contextUsed={contextUsed}
+            showExplorer={ideShowExplorer}
+            showChat={ideShowChat}
+            showTerminal={ideShowTerminal}
+            onExplorerChange={setIdeShowExplorer}
+            onChatChange={setIdeShowChat}
+            onTerminalChange={setIdeShowTerminal}
           />
         ) : (
           // Regular Chat View

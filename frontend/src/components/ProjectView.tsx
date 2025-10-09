@@ -15,6 +15,12 @@ interface ProjectViewProps {
   onRetryMessage: (messageId: string) => void;
   onBackToChat: () => void;
   contextUsed?: number;
+  showExplorer?: boolean;
+  showChat?: boolean;
+  showTerminal?: boolean;
+  onExplorerChange?: (show: boolean) => void;
+  onChatChange?: (show: boolean) => void;
+  onTerminalChange?: (show: boolean) => void;
 }
 
 interface OpenFile {
@@ -33,16 +39,24 @@ function ProjectView({
   onEditMessage,
   onRetryMessage,
   onBackToChat,
-  contextUsed = 0
+  contextUsed = 0,
+  showExplorer: propShowExplorer,
+  showChat: propShowChat,
+  showTerminal: propShowTerminal,
+  onExplorerChange,
+  onChatChange,
+  onTerminalChange
 }: ProjectViewProps) {
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
   const [activeFilePath, setActiveFilePath] = useState<string | null>(null);
   const [explorerWidth, setExplorerWidth] = useState(250);
   const [chatWidth, setChatWidth] = useState(350);
-  const [showExplorer, setShowExplorer] = useState(true);
-  const [showChat, setShowChat] = useState(true);
-  const [showTerminal, setShowTerminal] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(200);
+  
+  // Use props if provided, otherwise use local state
+  const showExplorer = propShowExplorer !== undefined ? propShowExplorer : true;
+  const showChat = propShowChat !== undefined ? propShowChat : true;
+  const showTerminal = propShowTerminal !== undefined ? propShowTerminal : false;
 
   const handleFileOpen = async (filePath: string, fileName: string) => {
     console.log("Opening file:", fileName, "at path:", filePath);

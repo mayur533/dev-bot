@@ -1,9 +1,31 @@
 import { useState, useEffect } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Minus, Square, X } from "lucide-react";
+import { Minus, Square, X, PanelLeft, PanelRight, Terminal, Settings, ArrowLeft } from "lucide-react";
 import "./TitleBar.css";
 
-function TitleBar() {
+interface TitleBarProps {
+  isIDEMode?: boolean;
+  showExplorer?: boolean;
+  showChat?: boolean;
+  showTerminal?: boolean;
+  onToggleExplorer?: () => void;
+  onToggleChat?: () => void;
+  onToggleTerminal?: () => void;
+  onCloseIDE?: () => void;
+  onSettings?: () => void;
+}
+
+function TitleBar({ 
+  isIDEMode = false,
+  showExplorer = true,
+  showChat = true,
+  showTerminal = false,
+  onToggleExplorer,
+  onToggleChat,
+  onToggleTerminal,
+  onCloseIDE,
+  onSettings
+}: TitleBarProps) {
   const [isMaximized, setIsMaximized] = useState(false);
 
   useEffect(() => {
@@ -79,6 +101,18 @@ function TitleBar() {
   return (
     <div className="titlebar" data-tauri-drag-region="true" onDoubleClick={handleDoubleClick}>
       <div className="titlebar-left" data-tauri-drag-region="true">
+        {/* Back button - before icon/title */}
+        {isIDEMode && (
+          <button
+            className="titlebar-ide-button back-button"
+            onClick={onCloseIDE}
+            title="Back to Chat"
+            type="button"
+          >
+            <ArrowLeft size={16} />
+          </button>
+        )}
+        
         <div className="titlebar-icon">
           <img src="/vite.svg" alt="App Icon" className="app-icon" />
         </div>
@@ -86,6 +120,44 @@ function TitleBar() {
       </div>
 
       <div className="titlebar-controls">
+        {/* IDE Mode Controls - near window controls */}
+        {isIDEMode && (
+          <div className="titlebar-ide-controls">
+            <button
+              className="titlebar-ide-button"
+              onClick={onToggleExplorer}
+              title="Toggle File Explorer"
+              type="button"
+            >
+              {showExplorer ? <PanelLeft size={16} fill="currentColor" /> : <PanelLeft size={16} />}
+            </button>
+            <button
+              className="titlebar-ide-button"
+              onClick={onToggleChat}
+              title="Toggle Chat Sidebar"
+              type="button"
+            >
+              {showChat ? <PanelRight size={16} fill="currentColor" /> : <PanelRight size={16} />}
+            </button>
+            <button
+              className="titlebar-ide-button"
+              onClick={onToggleTerminal}
+              title="Toggle Terminal"
+              type="button"
+            >
+              {showTerminal ? <Terminal size={16} fill="currentColor" /> : <Terminal size={16} />}
+            </button>
+            <button
+              className="titlebar-ide-button"
+              onClick={onSettings}
+              title="Settings"
+              type="button"
+            >
+              <Settings size={16} />
+            </button>
+          </div>
+        )}
+        
         <button
           className="titlebar-button minimize-button"
           onClick={handleMinimize}
