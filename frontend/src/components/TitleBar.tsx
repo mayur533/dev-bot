@@ -26,24 +26,48 @@ function TitleBar() {
   }, []);
 
   const handleMinimize = async () => {
-    const appWindow = getCurrentWindow();
-    await appWindow.minimize();
+    try {
+      const appWindow = getCurrentWindow();
+      await appWindow.minimize();
+    } catch (error) {
+      console.error("Failed to minimize window:", error);
+    }
   };
 
   const handleMaximize = async () => {
-    const appWindow = getCurrentWindow();
-    await appWindow.toggleMaximize();
-    setIsMaximized(!isMaximized);
+    try {
+      const appWindow = getCurrentWindow();
+      await appWindow.toggleMaximize();
+      const maximized = await appWindow.isMaximized();
+      setIsMaximized(maximized);
+    } catch (error) {
+      console.error("Failed to toggle maximize:", error);
+    }
   };
 
   const handleClose = async () => {
-    const appWindow = getCurrentWindow();
-    await appWindow.close();
+    try {
+      const appWindow = getCurrentWindow();
+      await appWindow.close();
+    } catch (error) {
+      console.error("Failed to close window:", error);
+    }
+  };
+
+  const handleDoubleClick = async () => {
+    try {
+      const appWindow = getCurrentWindow();
+      await appWindow.toggleMaximize();
+      const maximized = await appWindow.isMaximized();
+      setIsMaximized(maximized);
+    } catch (error) {
+      console.error("Failed to toggle maximize on double-click:", error);
+    }
   };
 
   return (
-    <div className="titlebar" data-tauri-drag-region>
-      <div className="titlebar-left">
+    <div className="titlebar" data-tauri-drag-region onDoubleClick={handleDoubleClick}>
+      <div className="titlebar-left" data-tauri-drag-region="true">
         <div className="titlebar-icon">
           <img src="/vite.svg" alt="App Icon" className="app-icon" />
         </div>
@@ -55,6 +79,7 @@ function TitleBar() {
           className="titlebar-button minimize-button"
           onClick={handleMinimize}
           title="Minimize"
+          type="button"
         >
           <Minus size={16} />
         </button>
@@ -62,6 +87,7 @@ function TitleBar() {
           className="titlebar-button maximize-button"
           onClick={handleMaximize}
           title={isMaximized ? "Restore" : "Maximize"}
+          type="button"
         >
           <Square size={14} />
         </button>
@@ -69,6 +95,7 @@ function TitleBar() {
           className="titlebar-button close-button"
           onClick={handleClose}
           title="Close"
+          type="button"
         >
           <X size={16} />
         </button>
