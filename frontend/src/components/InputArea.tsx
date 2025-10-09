@@ -42,9 +42,14 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
+    
+    // Reset height to auto to get the natural height
     e.target.style.height = "auto";
     
-    // Both chat and IDE windows - 10 line expansion
+    // Get the scroll height (natural content height)
+    const scrollHeight = e.target.scrollHeight;
+    
+    // Calculate line height from computed styles
     const computedStyle = getComputedStyle(e.target);
     const fontSize = parseFloat(computedStyle.fontSize);
     const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
@@ -52,14 +57,20 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
     const paddingBottom = parseFloat(computedStyle.paddingBottom);
     
     // Calculate max height for 10 lines
-    const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
+    const maxHeightLines = (lineHeight * 10) + paddingTop + paddingBottom;
     
-    // Set height to content height, but cap at 10 lines
-    const newHeight = Math.min(e.target.scrollHeight, maxHeight);
+    // Calculate 20vh in pixels
+    const maxHeight20vh = window.innerHeight * 0.20;
+    
+    // Use the smaller of 10 lines or 20vh
+    const maxHeight = Math.min(maxHeightLines, maxHeight20vh);
+    
+    // Set the height - either content height or max limit
+    const newHeight = Math.min(scrollHeight, maxHeight);
     e.target.style.height = newHeight + "px";
     
-    // Ensure overflow is set to auto when content exceeds 10 lines
-    if (e.target.scrollHeight > maxHeight) {
+    // Set overflow based on whether content exceeds max height
+    if (scrollHeight > maxHeight) {
       e.target.style.overflowY = "auto";
     } else {
       e.target.style.overflowY = "hidden";
@@ -176,25 +187,17 @@ function InputArea({ onSendMessage, isLoading, showFooter = true, compact = fals
     if (inputRef.current) {
       const textarea = inputRef.current;
       
-      // Both chat and IDE windows - 10 line expansion
+      // Calculate line height from computed styles
       const computedStyle = getComputedStyle(textarea);
       const fontSize = parseFloat(computedStyle.fontSize);
       const lineHeight = parseFloat(computedStyle.lineHeight) || (fontSize * 1.5);
       const paddingTop = parseFloat(computedStyle.paddingTop);
       const paddingBottom = parseFloat(computedStyle.paddingBottom);
       
-      // Calculate max height for 10 lines
-      const maxHeight = (lineHeight * 10) + paddingTop + paddingBottom;
-      
-      // Set initial height
-      textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + "px";
-      
-      // Ensure overflow is set correctly
-      if (textarea.scrollHeight > maxHeight) {
-        textarea.style.overflowY = "auto";
-      } else {
-        textarea.style.overflowY = "hidden";
-      }
+      // Set initial height to 2 lines (comfortable starting size)
+      const initialHeight = (lineHeight * 2) + paddingTop + paddingBottom;
+      textarea.style.height = initialHeight + "px";
+      textarea.style.overflowY = "hidden";
     }
   }, []);
 

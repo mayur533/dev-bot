@@ -314,7 +314,7 @@
   font-family: inherit;
   color: var(--text-primary);
   resize: none;
-  min-height: 40px;
+  min-height: 52px; /* ~2 lines at default font size */
   line-height: 1.5;
   overflow-y: hidden;
   box-sizing: border-box;
@@ -323,11 +323,11 @@
 
 /* Compact mode - for IDE window */
 .input-container.compact .input-textarea {
-  min-height: 52px;
+  min-height: 48px; /* ~2 lines at smaller font size */
   font-size: 0.875rem;
   padding: 0.5rem;
   overflow-y: hidden;
-  /* 10-line expansion handled by JavaScript */
+  /* Expansion to 10 lines or 20vh handled by JavaScript */
 }
 
 /* Show scrollbar when content overflows */
