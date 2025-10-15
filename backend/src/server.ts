@@ -164,7 +164,7 @@ app.post('/api/chat/sessions/:id/messages', async (req: Request, res: Response) 
     session.updatedAt = Date.now();
     db.updateSession(sessionId, { messages: session.messages });
     
-    res.json({
+    return res.json({
       userMessage,
       assistantMessage,
       contextStats: contextManager.getContextStats(context),
@@ -172,7 +172,7 @@ app.post('/api/chat/sessions/:id/messages', async (req: Request, res: Response) 
     
   } catch (error: any) {
     console.error('Error sending message:', error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -185,9 +185,9 @@ app.get('/api/chat/sessions/:id/context', async (req: Request, res: Response) =>
     const stats = contextManager.getContextStats(context);
     const summary = await contextManager.getContextSummary(context.id);
     
-    res.json({ stats, summary });
+    return res.json({ stats, summary });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -236,9 +236,9 @@ app.post('/api/projects', async (req: Request, res: Response) => {
     // Create context for project
     await contextManager.createContext(undefined, project.id);
     
-    res.json(project);
+    return res.json(project);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -303,10 +303,10 @@ app.post('/api/agent/analyze', async (req: Request, res: Response) => {
     
     const result = await coordinator.analyzeProject(projectBrief, sessionId, projectId);
     
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
     console.error('Error analyzing project:', error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -361,9 +361,9 @@ app.post('/api/files/read', async (req: Request, res: Response) => {
   try {
     const { filePath } = req.body;
     const content = await fileTools.readFile(filePath);
-    res.json({ content });
+    return res.json({ content });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -374,9 +374,9 @@ app.post('/api/files/write', async (req: Request, res: Response) => {
   try {
     const { filePath, content } = req.body;
     await fileTools.writeFile(filePath, content);
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -387,9 +387,9 @@ app.post('/api/files/analyze', async (req: Request, res: Response) => {
   try {
     const { filePath } = req.body;
     const analysis = await fileTools.analyzeFile(filePath);
-    res.json(analysis);
+    return res.json(analysis);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -400,9 +400,9 @@ app.post('/api/files/replace', async (req: Request, res: Response) => {
   try {
     const { filePath, searchPattern, replacement, global } = req.body;
     const result = await fileTools.replaceInFile(filePath, searchPattern, replacement, global);
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -413,9 +413,9 @@ app.post('/api/files/replace-content', async (req: Request, res: Response) => {
   try {
     const { filePath, newContent } = req.body;
     await fileTools.replaceFileContent(filePath, newContent);
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -435,9 +435,9 @@ app.post('/api/commands/request', (req: Request, res: Response) => {
     }
     
     const pendingCommand = commandTools.requestCommand(command, workingDirectory);
-    res.json(pendingCommand);
+    return res.json(pendingCommand);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
