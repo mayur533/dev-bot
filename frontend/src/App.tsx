@@ -11,58 +11,7 @@ import OpenProjectDialog from "./components/OpenProjectDialog";
 import ProjectView from "./components/ProjectView";
 import "./App.css";
 
-// Sample data generator
-const generateSampleMessages = (): Message[] => {
-  return [
-    {
-      id: "1",
-      role: "user",
-      content: "Show me how to create a Python FastAPI server",
-      type: "text",
-    },
-    {
-      id: "2",
-      role: "assistant",
-      content: "I'll help you create a FastAPI server. First, let's install FastAPI:",
-      type: "text",
-    },
-    {
-      id: "3",
-      role: "assistant",
-      content: "pip install fastapi uvicorn",
-      type: "command",
-    },
-    {
-      id: "4",
-      role: "assistant",
-      content: `from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)`,
-      type: "code",
-      language: "python",
-    },
-    {
-      id: "5",
-      role: "assistant",
-      content: "Now run the server with:",
-      type: "text",
-    },
-    {
-      id: "6",
-      role: "assistant",
-      content: "python main.py",
-      type: "command",
-    },
-  ];
-};
+// Removed sample data generator - now using real Gemini AI backend
 
 function App() {
   const [tabs, setTabs] = useState<ChatTab[]>([
@@ -88,6 +37,8 @@ function App() {
   const [ideShowChat, setIdeShowChat] = useState(true);
   const [ideShowTerminal, setIdeShowTerminal] = useState(false);
 
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
+
   // Initialize backend session when active tab changes
   useEffect(() => {
     const initSession = async () => {
@@ -103,8 +54,6 @@ function App() {
     };
     initSession();
   }, [activeTabId, activeTab, backendSessionId]);
-
-  const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
   // Create new tab
   const handleNewTab = () => {
