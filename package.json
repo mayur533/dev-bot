@@ -1,0 +1,29 @@
+{
+  "name": "ai-platform",
+  "version": "1.0.0",
+  "description": "AI Platform with Gemini agents, context management, and tools",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run tauri dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run tauri dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd backend && npm run build && cd ../frontend && npm run tauri build",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run tauri build"
+  },
+  "keywords": [
+    "ai",
+    "gemini",
+    "agents",
+    "platform"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+

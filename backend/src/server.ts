@@ -50,7 +50,7 @@ const commandTools = getCommandTools();
 // HEALTH CHECK
 // ============================================================================
 
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: Date.now() });
 });
 
@@ -90,7 +90,7 @@ app.post('/api/chat/sessions', async (req: Request, res: Response) => {
 /**
  * GET /api/chat/sessions - Get all sessions
  */
-app.get('/api/chat/sessions', (req: Request, res: Response) => {
+app.get('/api/chat/sessions', (_req: Request, res: Response) => {
   try {
     const sessions = db.getAllSessions();
     res.json(sessions);
@@ -108,9 +108,9 @@ app.get('/api/chat/sessions/:id', (req: Request, res: Response) => {
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    res.json(session);
+    return res.json(session);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -197,9 +197,9 @@ app.get('/api/chat/sessions/:id/context', async (req: Request, res: Response) =>
 app.delete('/api/chat/sessions/:id', (req: Request, res: Response) => {
   try {
     db.deleteSession(req.params.id);
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -245,7 +245,7 @@ app.post('/api/projects', async (req: Request, res: Response) => {
 /**
  * GET /api/projects - Get all projects
  */
-app.get('/api/projects', (req: Request, res: Response) => {
+app.get('/api/projects', (_req: Request, res: Response) => {
   try {
     const projects = db.getAllProjects();
     res.json(projects);
@@ -263,9 +263,9 @@ app.get('/api/projects/:id', (req: Request, res: Response) => {
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
     }
-    res.json(project);
+    return res.json(project);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -280,9 +280,9 @@ app.get('/api/projects/:id/structure', async (req: Request, res: Response) => {
     }
     
     const structure = await fileTools.getProjectStructure(project.path);
-    res.json(structure);
+    return res.json(structure);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -331,10 +331,10 @@ app.post('/api/agent/execute-task', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid agent assignment' });
     }
     
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
     console.error('Error executing task:', error);
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -344,9 +344,9 @@ app.post('/api/agent/execute-task', async (req: Request, res: Response) => {
 app.get('/api/agent/tasks/:sessionId', (req: Request, res: Response) => {
   try {
     const tasks = db.getTasksBySession(req.params.sessionId);
-    res.json(tasks);
+    return res.json(tasks);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -444,7 +444,7 @@ app.post('/api/commands/request', (req: Request, res: Response) => {
 /**
  * GET /api/commands/pending - Get all pending commands
  */
-app.get('/api/commands/pending', (req: Request, res: Response) => {
+app.get('/api/commands/pending', (_req: Request, res: Response) => {
   try {
     const pending = commandTools.getPendingCommands();
     res.json(pending);
@@ -465,9 +465,9 @@ app.post('/api/commands/execute', async (req: Request, res: Response) => {
     }
     
     const result = await commandTools.executeConfirmedCommand(commandId, confirmed);
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -483,16 +483,16 @@ app.post('/api/commands/execute-direct', async (req: Request, res: Response) => 
     }
     
     const result = await commandTools.executeCommand(command, workingDirectory);
-    res.json(result);
+    return res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 });
 
 /**
  * GET /api/commands/examples - Get safe command examples
  */
-app.get('/api/commands/examples', (req: Request, res: Response) => {
+app.get('/api/commands/examples', (_req: Request, res: Response) => {
   try {
     const examples = commandTools.getSafeCommandExamples();
     res.json(examples);
@@ -505,7 +505,7 @@ app.get('/api/commands/examples', (req: Request, res: Response) => {
 // ERROR HANDLING
 // ============================================================================
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });

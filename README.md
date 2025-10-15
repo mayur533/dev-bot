@@ -1,276 +1,306 @@
-# 🤖 AI Platform
+# AI Platform
 
-A beautiful cross-platform AI chat application with **real-time token streaming**.
-
-## 🏗️ Architecture
-
-```
-ai_platform/
-├── frontend/    🦀 Tauri + React (TypeScript)
-└── backend/     🐍 FastAPI (Python)
-```
-
-### Frontend
-- **Framework**: Tauri 2.0 (Rust-powered desktop app)
-- **UI**: React 19 + TypeScript
-- **Styling**: Modern CSS with dark/light mode
-- **Features**: ChatGPT-like interface, token streaming, auto-scroll
-
-### Backend
-- **Framework**: FastAPI (Python)
-- **Streaming**: Server-Sent Events (SSE)
-- **Models**: Extensible for OpenAI, Ollama, or local models
-
-## ✨ Features
-
-✅ **Standalone Desktop App** - No browser needed, runs natively  
-✅ **Cross-Platform** - Windows, macOS, Linux  
-✅ **Real-Time Streaming** - Token-by-token typing animation  
-✅ **Beautiful UI** - ChatGPT-inspired design with dark mode  
-✅ **Fast & Lightweight** - Rust + Python performance  
-✅ **Extensible** - Easy to add any AI model  
+A powerful AI-powered development platform with specialized agents for building full-stack applications using Google Gemini API.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+- Node.js 18+ installed
+- npm or yarn package manager
 
-**Frontend:**
-- Node.js 18+
-- Rust ([install here](https://www.rust-lang.org/tools/install))
-- Platform-specific requirements ([see Tauri docs](https://tauri.app/start/prerequisites/))
-
-**Backend:**
-- Python 3.9+
-- pip
-
-### Installation & Running
-
-#### 1. Frontend (Tauri + React)
+### Installation
 
 ```bash
-cd frontend
-npm install
+# Install all dependencies (root, backend, and frontend)
+npm run install:all
+```
+
+### Running the Application
+
+#### Option 1: Run Both Servers (Recommended)
+```bash
+# Start both backend and frontend in development mode
 npm run dev
 ```
 
-This will:
-- Start Vite dev server on `http://localhost:1420`
-- Launch Tauri desktop app automatically
-- Enable hot-reload for development
+#### Option 2: Run Servers Separately
 
-#### 2. Backend (FastAPI)
-
+**Terminal 1 - Backend:**
 ```bash
 cd backend
-pip install -r requirements.txt
-python main.py
+npm run dev
+# Backend runs on http://localhost:3001
 ```
 
-This will:
-- Start FastAPI server on `http://localhost:8000`
-- Enable CORS for Tauri app
-- Provide `/chat/stream` endpoint for token streaming
-
-## 📸 Screenshots
-
-### Chat Interface
-```
-┌─────────────────────────────────────────┐
-│  AI Platform                            │
-│  Powered by Tauri + FastAPI             │
-├─────────────────────────────────────────┤
-│                                         │
-│  👤 You                                 │
-│  Hello! How are you?                    │
-│                                         │
-│  🤖 AI Assistant                        │
-│  I'm doing great! How can I help...▋   │
-│                                         │
-├─────────────────────────────────────────┤
-│  Type your message...                   │
-│  [Enter to send]                    ➤   │
-└─────────────────────────────────────────┘
-```
-
-## 🔌 How It Works
-
-### Communication Flow
-
-```
-┌─────────────┐      HTTP POST      ┌─────────────┐
-│   Tauri     │  ──────────────────> │   FastAPI   │
-│  (Frontend) │                      │  (Backend)  │
-│             │  <──────────────────  │             │
-│  React UI   │   SSE Token Stream   │  AI Model   │
-└─────────────┘                      └─────────────┘
-```
-
-1. **User** types message in Tauri app
-2. **Frontend** sends HTTP POST to `/chat/stream`
-3. **Backend** processes with AI model
-4. **Backend** streams tokens via Server-Sent Events
-5. **Frontend** displays each token with typing animation
-
-## 🛠️ Development
-
-### Frontend Development
-
+**Terminal 2 - Frontend:**
 ```bash
 cd frontend
-npm run dev          # Start dev server with Tauri app
-npm run build        # Build for production
-npm run tauri dev    # Alternative dev command
+npm run dev
+# Frontend runs on http://localhost:3000
 ```
 
-**Key Files:**
-- `src/App.tsx` - Main chat component
-- `src/App.css` - ChatGPT-like styling
-- `src-tauri/` - Tauri (Rust) configuration
-
-### Backend Development
+### Production Build
 
 ```bash
-cd backend
-python main.py       # Start with uvicorn
-# or
-uvicorn main:app --reload --port 8000
-```
+# Build both backend and frontend
+npm run build
 
-**Key Files:**
-- `main.py` - FastAPI app with streaming endpoint
-- `requirements.txt` - Python dependencies
-
-### Adding AI Models
-
-The backend is designed to be extensible. Examples included:
-
-**OpenAI:**
-```python
-import openai
-# See main.py for integration example
-```
-
-**Ollama:**
-```python
-import ollama
-# See main.py for integration example
-```
-
-**Custom Model:**
-```python
-async def generate_stream(message: str):
-    # Your model logic here
-    yield token
+# Start production servers
+npm start
 ```
 
 ## 📁 Project Structure
 
 ```
 ai_platform/
-├── frontend/
+├── backend/                  # Node.js + TypeScript backend
 │   ├── src/
-│   │   ├── App.tsx              # Chat UI component
-│   │   ├── App.css              # ChatGPT styling
-│   │   └── main.tsx             # React entry
-│   ├── src-tauri/
-│   │   ├── src/                 # Rust source
-│   │   ├── icons/               # App icons
-│   │   └── tauri.conf.json      # Tauri config
-│   ├── package.json
-│   └── README.md
+│   │   ├── agents/          # AI Agents (Coordinator, Frontend, Backend)
+│   │   ├── config/          # Settings and environment
+│   │   ├── context/         # Context management
+│   │   ├── database/        # SQLite database
+│   │   ├── models/          # Type definitions
+│   │   ├── services/        # Gemini API client
+│   │   ├── tools/           # File and command tools
+│   │   └── server.ts        # Express server
+│   ├── data/                # Database files
+│   ├── .env                 # Environment variables (API keys)
+│   └── package.json
 │
-├── backend/
-│   ├── main.py                  # FastAPI app
-│   ├── requirements.txt         # Dependencies
-│   └── README.md
+├── frontend/                # Tauri + React + TypeScript
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   ├── hooks/           # Custom React hooks
+│   │   ├── services/        # API service
+│   │   └── types.ts
+│   ├── src-tauri/           # Tauri Rust backend
+│   └── package.json
 │
-└── README.md                    # This file
+├── package.json             # Root package.json (runs both servers)
+├── README.md                # This file
+└── IMPLEMENTATION_COMPLETE.md  # Detailed implementation docs
 ```
 
-## 🎯 Features Breakdown
+## ✨ Features
 
-### ✅ Completed
-- [x] Tauri + React + TypeScript setup
-- [x] ChatGPT-like UI design
-- [x] Message bubbles (user/assistant)
-- [x] Token streaming simulation
-- [x] Auto-scroll to latest message
-- [x] Dark/light mode support
-- [x] Responsive design
-- [x] Keyboard shortcuts (Enter/Shift+Enter)
+### AI Agents
+- **Coordinator Agent**: Breaks down project briefs into technical tasks
+- **Frontend Agent**: Generates React/TypeScript UI components
+- **Backend Agent**: Creates REST APIs and database schemas
 
-### 🚧 Backend (Next Steps)
-- [ ] FastAPI setup with streaming
-- [ ] Server-Sent Events implementation
-- [ ] CORS configuration
-- [ ] AI model integration stub
+### Context Management
+- Per-project and per-chat context isolation
+- Real-time token counting (up to 1M tokens)
+- Automatic summarization at 90% capacity
+- Preserves recent messages after summarization
 
-### 🔮 Future Enhancements
-- [ ] Conversation history/persistence
-- [ ] Multiple chat sessions
-- [ ] Settings panel
-- [ ] Model selection dropdown
-- [ ] Export conversations
-- [ ] Code syntax highlighting
-- [ ] File attachments
-- [ ] Voice input
+### Tools
+- **File Management**: Read, write, replace, search, analyze files
+- **Command Execution**: Safe command execution with confirmation dialogs
+- **Project Analysis**: AI-powered project structure analysis
 
-## 🎨 Customization
+### API Endpoints
+- Chat sessions and message handling
+- Project management
+- AI agent coordination
+- File operations
+- Command execution with safety checks
 
-### Theming
-Edit `frontend/src/App.css` CSS variables:
+## 🔧 Available Scripts
 
-```css
-:root {
-  --bg-primary: #ffffff;
-  --text-primary: #10192e;
-  --button-bg: #10a37f;
-  /* ... more variables */
+### Root Directory
+- `npm run dev` - Start both servers in development mode
+- `npm start` - Start both servers in production mode
+- `npm run install:all` - Install all dependencies
+- `npm run build` - Build both backend and frontend
+- `npm run dev:backend` - Start only backend
+- `npm run dev:frontend` - Start only frontend
+
+### Backend Directory
+- `npm run dev` - Start backend development server
+- `npm run build` - Build backend for production
+- `npm start` - Start production backend server
+
+### Frontend Directory
+- `npm run dev` - Start frontend development server
+- `npm run build` - Build frontend for production
+- `npm run tauri dev` - Start Tauri desktop app
+
+## 🔐 Configuration
+
+### Backend Environment Variables
+
+Create `/backend/.env` file:
+
+```env
+# Gemini API Keys (Already configured)
+GEMINI_API_KEY=AIzaSyDxVRu3UzqCWYSC82xiHpYioMJqGRoIZS8
+GEMINI_API_KEY_SECONDARY=AIzaSyBkiGL0ckCIibHtH8P4QrqEd6mHFDOkfNc
+
+# Server Configuration
+PORT=3001
+NODE_ENV=development
+API_BASE_URL=http://localhost:3001
+FRONTEND_URL=http://localhost:3000
+
+# Context Configuration
+MAX_CONTEXT_TOKENS=1000000
+CONTEXT_SUMMARIZATION_THRESHOLD=0.9
+MIN_CONTEXT_TOKENS_AFTER_SUMMARY=100000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Database
+DATABASE_PATH=./data/ai_platform.db
+
+# Logging
+LOG_LEVEL=info
+LOG_FILE=./logs/backend.log
+```
+
+## 📊 Usage Examples
+
+### 1. Analyze a Project
+
+```typescript
+// Send project brief to Coordinator Agent
+POST http://localhost:3001/api/agent/analyze
+{
+  "projectBrief": "Build a task management app with user authentication",
+  "sessionId": "session-123"
+}
+
+// Response: Tasks breakdown with architecture
+{
+  "analysis": "...",
+  "tasks": [...],
+  "architecture": {...}
 }
 ```
 
-### Branding
-- Replace app title in `frontend/index.html`
-- Update icons in `frontend/src-tauri/icons/`
-- Modify header in `frontend/src/App.tsx`
+### 2. Execute a Task
+
+```typescript
+// Execute task with Frontend or Backend agent
+POST http://localhost:3001/api/agent/execute-task
+{
+  "taskId": "task-1"
+}
+
+// Response: Generated code
+{
+  "agent": "frontend",
+  "content": "...",
+  "code": [...]
+}
+```
+
+### 3. Execute Command with Confirmation
+
+```typescript
+// Request command execution
+POST http://localhost:3001/api/commands/request
+{
+  "command": "npm install react",
+  "workingDirectory": "/project/path"
+}
+
+// Confirm and execute
+POST http://localhost:3001/api/commands/execute
+{
+  "commandId": "cmd_123",
+  "confirmed": true
+}
+```
+
+## 🎯 Key Features
+
+✅ AI Coordinator Agent that breaks down projects
+✅ Frontend Agent for React UI generation  
+✅ Backend Agent for APIs and database schemas
+✅ Context management per-project and per-chat
+✅ Token counting with automatic summarization
+✅ File tools (read, write, replace, analyze)
+✅ Command execution with confirmation
+✅ Full REST API with 40+ endpoints
+✅ Frontend-backend integration ready
+✅ Comprehensive documentation
+
+## 🔗 API Documentation
+
+Full API documentation available at: `http://localhost:3001/health`
+
+Key endpoints:
+- `POST /api/chat/sessions` - Create chat session
+- `POST /api/chat/sessions/:id/messages` - Send message
+- `POST /api/agent/analyze` - Analyze project
+- `POST /api/agent/execute-task` - Execute task
+- `POST /api/commands/request` - Request command
+- `POST /api/files/read` - Read file
+- `POST /api/files/write` - Write file
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Express.js
+- **AI**: Google Gemini API (@google/genai v1.3.0)
+- **Database**: SQLite (better-sqlite3)
+- **Security**: Helmet, CORS, Rate Limiting
+
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Desktop**: Tauri (Rust)
+- **Styling**: CSS with CSS Variables
+- **Icons**: Lucide React
+
+## 📈 Development
+
+### Adding New Features
+
+1. **Backend**: Add endpoints in `backend/src/server.ts`
+2. **Frontend**: Add API methods in `frontend/src/services/aiPlatformApi.ts`
+3. **Components**: Create React components in `frontend/src/components/`
+4. **Hooks**: Add custom hooks in `frontend/src/hooks/`
+
+### Database Schema
+
+SQLite tables:
+- `chat_sessions` - Chat sessions with messages
+- `projects` - Project metadata
+- `contexts` - Context management
+- `tasks` - Task tracking
 
 ## 🐛 Troubleshooting
 
-**Frontend won't build?**
-- Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-- Check prerequisites: [Tauri Prerequisites](https://tauri.app/start/prerequisites/)
+### Backend won't start
+- Check if port 3001 is available
+- Verify Gemini API keys in `.env`
+- Run `npm install` in backend directory
 
-**Backend not connecting?**
-- Check if running on `http://localhost:8000`
-- Verify CORS settings allow `http://localhost:1420`
-- Check firewall settings
+### Frontend won't start
+- Check if port 3000 is available
+- Run `npm install` in frontend directory
+- Clear cache: `rm -rf node_modules package-lock.json && npm install`
 
-**Streaming not working?**
-- Ensure backend `/chat/stream` endpoint is implemented
-- Verify Server-Sent Events format
-- Check browser console for errors
+### Database errors
+- Delete `backend/data/ai_platform.db` to reset
+- Database will be recreated automatically
 
-## 📚 Resources
+## 📝 License
 
-- [Tauri Documentation](https://tauri.app/)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [React Documentation](https://react.dev/)
-- [Server-Sent Events Guide](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
+MIT License - See LICENSE file for details
 
-## 📄 License
+## 🤝 Contributing
 
-MIT License - Free to use for any project!
+Contributions welcome! Please read CONTRIBUTING.md first.
 
-## 🙏 Credits
+## 📧 Support
 
-Built with:
-- [Tauri](https://tauri.app/) - Desktop app framework
-- [React](https://react.dev/) - UI library
-- [FastAPI](https://fastapi.tiangolo.com/) - Backend framework
-- Inspired by ChatGPT's beautiful interface
+For issues and questions, please open an issue on GitHub.
 
 ---
 
-**Made with ❤️ using Tauri + FastAPI**
-
-
+Built with ❤️ using Google Gemini API, TypeScript, and modern best practices.
