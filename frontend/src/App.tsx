@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChatTab, Message } from "./types";
+import aiPlatformApi from "./services/aiPlatformApi";
 import TitleBar from "./components/TitleBar";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
@@ -80,11 +81,28 @@ function App() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showOpenProjectDialog, setShowOpenProjectDialog] = useState(false);
   const [contextUsed, setContextUsed] = useState(0);
+  const [backendSessionId, setBackendSessionId] = useState<string | null>(null);
   
   // IDE state (passed from ProjectView)
   const [ideShowExplorer, setIdeShowExplorer] = useState(true);
   const [ideShowChat, setIdeShowChat] = useState(true);
   const [ideShowTerminal, setIdeShowTerminal] = useState(false);
+
+  // Initialize backend session when active tab changes
+  useEffect(() => {
+    const initSession = async () => {
+      if (activeTab && activeTab.type === 'chat' && !backendSessionId) {
+        try {
+          const session = await aiPlatformApi.createSession(activeTab.title, undefined);
+          setBackendSessionId(session.id);
+          console.log('Backend session created:', session.id);
+        } catch (error) {
+          console.error('Failed to create backend session:', error);
+        }
+      }
+    };
+    initSession();
+  }, [activeTabId, activeTab, backendSessionId]);
 
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
 
@@ -99,6 +117,9 @@ function App() {
     };
     setTabs([...tabs, newTab]);
     setActiveTabId(newTab.id);
+    
+    // Reset backend session for new tab
+    setBackendSessionId(null);
   };
 
   // Delete tab
@@ -115,6 +136,11 @@ function App() {
 
   // Send message
   const handleSendMessage = async (content: string) => {
+    if (!backendSessionId) {
+      console.error('No backend session initialized');
+      return;
+    }
+
     const userMessageId = Date.now().toString();
     const userMessage: Message = {
       id: userMessageId,
@@ -123,7 +149,7 @@ function App() {
       type: "text",
     };
 
-    // Add user message
+    // Add user message to UI
     setTabs((prevTabs) =>
       prevTabs.map((tab) =>
         tab.id === activeTabId
@@ -136,13 +162,52 @@ function App() {
       )
     );
 
-    // Update context usage (approximate: count characters in all messages)
-    setContextUsed((prev) => prev + content.length);
-
     setIsLoading(true);
 
-    // Simulate API call with different response types
-    await simulateAPIResponse(content);
+    try {
+      // Send message to backend with Gemini AI
+      const response = await aiPlatformApi.sendMessage(backendSessionId, content);
+      
+      // Update context usage from backend
+      setContextUsed(response.contextStats.percentageUsed);
+
+      // Add assistant message to UI
+      const assistantMessage: Message = {
+        id: response.assistantMessage.id,
+        role: "assistant",
+        content: response.assistantMessage.content,
+        type: "text",
+      };
+
+      setTabs((prevTabs) =>
+        prevTabs.map((tab) =>
+          tab.id === activeTabId
+            ? { ...tab, messages: [...tab.messages, assistantMessage] }
+            : tab
+        )
+      );
+
+    } catch (error: any) {
+      console.error('Error sending message:', error);
+      
+      // Show error message to user
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: `❌ Error: ${error.message || 'Failed to get response from AI'}\n\nPlease make sure the backend server is running on http://localhost:3001`,
+        type: "text",
+      };
+
+      setTabs((prevTabs) =>
+        prevTabs.map((tab) =>
+          tab.id === activeTabId
+            ? { ...tab, messages: [...tab.messages, errorMessage] }
+            : tab
+        )
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Edit message
