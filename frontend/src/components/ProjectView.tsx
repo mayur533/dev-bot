@@ -27,7 +27,11 @@ interface OpenFile {
   path: string;
   name: string;
   content: string;
+  originalContent?: string; // For diff comparison
   language: string;
+  isDirty?: boolean;
+  isSupported?: boolean;
+  errorMessage?: string;
 }
 
 function ProjectView({ 
@@ -69,6 +73,37 @@ function ProjectView({
       return;
     }
 
+    const fileExtension = fileName.split('.').pop()?.toLowerCase() || '';
+    
+    // Check if file type is supported for text editing
+    const unsupportedBinaryExtensions = [
+      'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'svg', 'webp', // Images
+      'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', // Videos
+      'mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', // Audio
+      'zip', 'rar', '7z', 'tar', 'gz', 'bz2', // Archives
+      'exe', 'dll', 'so', 'dylib', 'bin', // Binaries
+      'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', // Documents
+      'ttf', 'otf', 'woff', 'woff2', 'eot', // Fonts
+      'db', 'sqlite', 'sqlite3' // Databases
+    ];
+
+    if (unsupportedBinaryExtensions.includes(fileExtension)) {
+      const newFile: OpenFile = {
+        path: filePath,
+        name: fileName,
+        content: '',
+        language: 'binary',
+        isSupported: false,
+        isDirty: false,
+        errorMessage: `This file type (.${fileExtension}) cannot be displayed in the text editor.`
+      };
+      
+      setOpenFiles([...openFiles, newFile]);
+      setActiveFilePath(filePath);
+      console.log("File type not supported for editing:", fileExtension);
+      return;
+    }
+
     try {
       // Read file content via Tauri
       const { invoke } = await import("@tauri-apps/api/core");
@@ -80,14 +115,16 @@ function ProjectView({
       
       console.log("File content loaded, length:", fileContent.length);
 
-      const fileExtension = fileName.split('.').pop() || '';
       const language = getLanguageFromExtension(fileExtension);
 
       const newFile: OpenFile = {
         path: filePath,
         name: fileName,
         content: fileContent,
-        language
+        originalContent: fileContent, // Store original for diff
+        language,
+        isDirty: false,
+        isSupported: true
       };
 
       setOpenFiles([...openFiles, newFile]);
@@ -95,7 +132,20 @@ function ProjectView({
       console.log("File opened successfully");
     } catch (error) {
       console.error("Failed to open file:", error);
-      alert(`Failed to open file: ${error}\n\nFile: ${fileName}\nPath: ${filePath}`);
+      
+      // Create an unsupported file entry with error message
+      const newFile: OpenFile = {
+        path: filePath,
+        name: fileName,
+        content: '',
+        language: 'text',
+        isSupported: false,
+        isDirty: false,
+        errorMessage: `Failed to read file: ${error instanceof Error ? error.message : String(error)}`
+      };
+      
+      setOpenFiles([...openFiles, newFile]);
+      setActiveFilePath(filePath);
     }
   };
 
@@ -111,7 +161,13 @@ function ProjectView({
 
   const handleFileChange = (filePath: string, newContent: string) => {
     setOpenFiles(openFiles.map(f => 
-      f.path === filePath ? { ...f, content: newContent } : f
+      f.path === filePath 
+        ? { 
+            ...f, 
+            content: newContent,
+            isDirty: newContent !== f.originalContent
+          } 
+        : f
     ));
   };
 

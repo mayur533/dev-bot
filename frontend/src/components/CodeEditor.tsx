@@ -1,11 +1,17 @@
-import { X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Terminal } from "lucide-react";
+import { X, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Terminal, GitCompare, FileEdit } from "lucide-react";
+import { useState } from "react";
+import DiffViewer from "./DiffViewer";
 import "./CodeEditor.css";
 
 interface OpenFile {
   path: string;
   name: string;
   content: string;
+  originalContent?: string; // For diff comparison
   language: string;
+  isDirty?: boolean;
+  isSupported?: boolean;
+  errorMessage?: string;
 }
 
 interface CodeEditorProps {
@@ -35,12 +41,40 @@ function CodeEditor({
   onToggleChat,
   onToggleTerminal
 }: CodeEditorProps) {
+  const [viewMode, setViewMode] = useState<"edit" | "diff">("edit");
   
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (activeFile) {
       onFileChange(activeFile.path, e.target.value);
     }
   };
+
+  const handleAcceptChange = (hunkId: string) => {
+    console.log("Accepted change:", hunkId);
+    // Accept logic can be handled in parent component
+  };
+
+  const handleRejectChange = (hunkId: string) => {
+    console.log("Rejected change:", hunkId);
+    // Reject logic can be handled in parent component
+  };
+
+  const handleAcceptAll = () => {
+    if (activeFile) {
+      console.log("Accepted all changes for:", activeFile.path);
+      // This would apply all changes
+    }
+  };
+
+  const handleRejectAll = () => {
+    if (activeFile && activeFile.originalContent) {
+      // Revert to original content
+      onFileChange(activeFile.path, activeFile.originalContent);
+      console.log("Rejected all changes for:", activeFile.path);
+    }
+  };
+
+  const hasChanges = activeFile && activeFile.originalContent && activeFile.content !== activeFile.originalContent;
 
   return (
     <div className="code-editor">
@@ -53,10 +87,13 @@ function CodeEditor({
             openFiles.map((file) => (
               <div
                 key={file.path}
-                className={`editor-tab ${activeFile?.path === file.path ? 'active' : ''}`}
+                className={`editor-tab ${activeFile?.path === file.path ? 'active' : ''} ${file.isDirty ? 'dirty' : ''}`}
                 onClick={() => onFileSelect(file.path)}
               >
-                <span className="tab-name">{file.name}</span>
+                <span className="tab-name">
+                  {file.isDirty && <span className="dirty-indicator">● </span>}
+                  {file.name}
+                </span>
                 <button
                   className="tab-close"
                   onClick={(e) => {
@@ -71,26 +108,71 @@ function CodeEditor({
             ))
           )}
         </div>
+        
+        {/* View Mode Toggle */}
+        {hasChanges && (
+          <div className="view-mode-toggle">
+            <button
+              className={`mode-btn ${viewMode === "edit" ? "active" : ""}`}
+              onClick={() => setViewMode("edit")}
+              title="Edit Mode"
+            >
+              <FileEdit size={16} />
+            </button>
+            <button
+              className={`mode-btn ${viewMode === "diff" ? "active" : ""}`}
+              onClick={() => setViewMode("diff")}
+              title="Diff Mode"
+            >
+              <GitCompare size={16} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Editor Content */}
       <div className="editor-content">
         {activeFile ? (
-          <div className="editor-wrapper">
-            <div className="editor-content-inner">
-              <div className="editor-lines">
-                {activeFile.content.split('\n').map((_, index) => (
-                  <div key={index} className="line-number">{index + 1}</div>
-                ))}
+          activeFile.isSupported === false ? (
+            <div className="editor-unsupported">
+              <div className="unsupported-icon">⚠️</div>
+              <h3>File Not Supported</h3>
+              <p className="unsupported-filename">{activeFile.name}</p>
+              <p className="unsupported-message">
+                {activeFile.errorMessage || 'This file type cannot be displayed in the text editor.'}
+              </p>
+              <div className="unsupported-info">
+                <p><strong>File path:</strong> {activeFile.path}</p>
+                <p><strong>File type:</strong> {activeFile.language}</p>
               </div>
-              <textarea
-                className="editor-textarea"
-                value={activeFile.content}
-                onChange={handleEditorChange}
-                spellCheck={false}
-              />
             </div>
-          </div>
+          ) : viewMode === "diff" && activeFile.originalContent ? (
+            <DiffViewer
+              originalContent={activeFile.originalContent}
+              modifiedContent={activeFile.content}
+              fileName={activeFile.name}
+              onAcceptChange={handleAcceptChange}
+              onRejectChange={handleRejectChange}
+              onAcceptAll={handleAcceptAll}
+              onRejectAll={handleRejectAll}
+            />
+          ) : (
+            <div className="editor-wrapper">
+              <div className="editor-content-inner">
+                <div className="editor-lines">
+                  {activeFile.content.split('\n').map((_, index) => (
+                    <div key={index} className="line-number">{index + 1}</div>
+                  ))}
+                </div>
+                <textarea
+                  className="editor-textarea"
+                  value={activeFile.content}
+                  onChange={handleEditorChange}
+                  spellCheck={false}
+                />
+              </div>
+            </div>
+          )
         ) : (
           <div className="editor-empty">
             <div className="empty-icon">📝</div>

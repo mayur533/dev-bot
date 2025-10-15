@@ -31,3 +31,21 @@ export interface APIConfig {
   headers?: Record<string, string>;
 }
 
+// User and Authentication types
+export type UserRole = "admin" | "subadmin";
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: UserRole;
+  name: string;
+  avatar?: string;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: User | null;
+  token: string | null;
+}
+
