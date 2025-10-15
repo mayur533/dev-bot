@@ -1,34 +1,22 @@
-import { GoogleGenerativeAI, GenerativeModel, Content, Part, CountTokensResponse } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import settings from '../config/settings';
-import { Message, TokenUsage, AgentResponse } from '../models/types';
+import { Message, AgentResponse } from '../models/types';
 
 /**
  * Gemini API Client with context management and token counting
  * Uses the new @google/genai SDK as per https://ai.google.dev/gemini-api/docs/libraries
  */
 export class GeminiClient {
-  private client: GoogleGenerativeAI;
-  private secondaryClient?: GoogleGenerativeAI;
-  private model: GenerativeModel;
+  private client: GoogleGenAI;
+  private secondaryClient?: GoogleGenAI;
   private currentApiKey: 'primary' | 'secondary' = 'primary';
 
   constructor() {
-    this.client = new GoogleGenerativeAI(settings.geminiApiKey);
+    this.client = new GoogleGenAI({ apiKey: settings.geminiApiKey });
     
     if (settings.geminiApiKeySecondary) {
-      this.secondaryClient = new GoogleGenerativeAI(settings.geminiApiKeySecondary);
+      this.secondaryClient = new GoogleGenAI({ apiKey: settings.geminiApiKeySecondary });
     }
-
-    // Initialize with Gemini 2.0 Flash model (best for general tasks)
-    this.model = this.client.getGenerativeModel({ 
-      model: 'gemini-2.0-flash-exp',
-      generationConfig: {
-        temperature: 0.7,
-        topP: 0.95,
-        topK: 40,
-        maxOutputTokens: 8192,
-      },
-    });
   }
 
   /**
@@ -37,28 +25,19 @@ export class GeminiClient {
   private switchApiKey(): void {
     if (this.secondaryClient && this.currentApiKey === 'primary') {
       this.currentApiKey = 'secondary';
-      this.model = this.secondaryClient.getGenerativeModel({ 
-        model: 'gemini-2.0-flash-exp',
-        generationConfig: {
-          temperature: 0.7,
-          topP: 0.95,
-          topK: 40,
-          maxOutputTokens: 8192,
-        },
-      });
       console.log('Switched to secondary API key');
     }
   }
 
   /**
-   * Convert our Message format to Gemini's Content format
+   * Convert our Message format to Gemini's content format
    */
-  private messagesToContent(messages: Message[]): Content[] {
+  private messagesToContent(messages: Message[]): any[] {
     return messages
       .filter(msg => msg.role !== 'system') // System messages handled separately
       .map(msg => ({
         role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }] as Part[],
+        parts: [{ text: msg.content }],
       }));
   }
 
@@ -67,8 +46,11 @@ export class GeminiClient {
    */
   async countTokens(messages: Message[]): Promise<number> {
     try {
-      const contents = this.messagesToContent(messages);
-      const result: CountTokensResponse = await this.model.countTokens({ contents });
+      const prompt = this.buildPrompt(messages);
+      const result = await this.client.models.countTokens({
+        model: 'gemini-2.0-flash-exp',
+        contents: prompt
+      });
       return result.totalTokens || 0;
     } catch (error) {
       console.error('Error counting tokens:', error);
@@ -94,32 +76,24 @@ export class GeminiClient {
       // Build the full prompt with system instructions
       const fullPrompt = this.buildPrompt(messages, systemPrompt);
       
-      // Configure model for this request
-      const config = {
-        temperature: options?.temperature ?? 0.7,
-        maxOutputTokens: options?.maxTokens ?? 8192,
-      };
-
       // For thinking mode, use Gemini 2.0 Flash Thinking model
       const modelName = options?.thinking ? 'gemini-2.0-flash-thinking-exp' : 'gemini-2.0-flash-exp';
-      const model = this.client.getGenerativeModel({ 
+
+      // Generate response using the new SDK
+      const result = await this.client.models.generateContent({
         model: modelName,
-        generationConfig: config,
+        contents: fullPrompt,
+        config: {
+          temperature: options?.temperature ?? 0.7,
+          maxOutputTokens: options?.maxTokens ?? 8192,
+        }
       });
 
-      // Generate response
-      const result = await model.generateContent(fullPrompt);
-      const response = result.response;
-      const text = response.text();
+      const text = result.text || '';
 
-      // Count tokens used
+      // Count tokens used (simplified for now)
       const inputTokens = await this.countTokens(messages);
-      const outputTokens = await this.countTokens([{
-        id: 'temp',
-        role: 'assistant',
-        content: text,
-        timestamp: Date.now(),
-      }]);
+      const outputTokens = this.estimateTokens(text);
 
       return {
         agent: 'gemini',
@@ -133,7 +107,25 @@ export class GeminiClient {
       // Try secondary key if available
       if (this.currentApiKey === 'primary' && this.secondaryClient) {
         this.switchApiKey();
-        return this.generateResponse(messages, systemPrompt, options);
+        // Use secondary client
+        try {
+          const result = await this.secondaryClient!.models.generateContent({
+            model: 'gemini-2.0-flash-exp',
+            contents: this.buildPrompt(messages, systemPrompt),
+            config: {
+              temperature: options?.temperature ?? 0.7,
+              maxOutputTokens: options?.maxTokens ?? 8192,
+            }
+          });
+          
+          return {
+            agent: 'gemini',
+            content: result.text || '',
+            tokens: 0,
+          };
+        } catch (secondaryError: any) {
+          throw new Error(`Gemini API error (both keys failed): ${secondaryError.message}`);
+        }
       }
       
       throw new Error(`Gemini API error: ${error.message}`);
@@ -151,19 +143,17 @@ export class GeminiClient {
     try {
       const fullPrompt = this.buildPrompt(messages, systemPrompt);
       
-      const model = this.client.getGenerativeModel({ 
+      const result = await this.client.models.generateContent({ 
         model: 'gemini-2.0-flash-exp',
-        generationConfig: {
+        contents: fullPrompt,
+        config: {
           temperature: 0.3, // Lower temperature for structured output
           responseMimeType: 'application/json',
           responseSchema: schema,
         },
       });
 
-      const result = await model.generateContent(fullPrompt);
-      const response = result.response;
-      const text = response.text();
-
+      const text = result.text || '{}';
       return JSON.parse(text);
 
     } catch (error: any) {
@@ -183,28 +173,15 @@ export class GeminiClient {
     try {
       const fullPrompt = this.buildPrompt(messages, systemPrompt);
       
-      const model = this.client.getGenerativeModel({ 
+      const result = await this.client.models.generateContent({ 
         model: 'gemini-2.0-flash-exp',
+        contents: fullPrompt,
         tools: tools,
       });
 
-      const result = await model.generateContent(fullPrompt);
-      const response = result.response;
-      
-      // Check if function call was made
-      const functionCalls = response.functionCalls();
-      
-      if (functionCalls && functionCalls.length > 0) {
-        return {
-          agent: 'gemini',
-          content: JSON.stringify(functionCalls),
-          tokens: 0, // Will be counted separately
-        };
-      }
-
       return {
         agent: 'gemini',
-        content: response.text(),
+        content: result.text || '',
         tokens: 0,
       };
 
