@@ -197,7 +197,7 @@ export class ContextManager {
   /**
    * Clear old contexts (cleanup utility)
    */
-  async clearOldContexts(olderThanDays: number = 30): Promise<number> {
+  async clearOldContexts(_olderThanDays: number = 30): Promise<number> {
     // This would require additional database methods
     // Implementation left for future enhancement
     return 0;
