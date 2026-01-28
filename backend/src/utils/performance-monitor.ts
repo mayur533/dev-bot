@@ -127,19 +127,6 @@ export class PerformanceMonitor {
     return filteredMetrics;
   }
 
-  public getMetricsByTimeRange(
-    startTime: Date,
-    endTime: Date,
-    name?: string
-  ): PerformanceMetric[] {
-    return this.metrics.filter(metric => {
-      const metricTime = new Date(metric.timestamp);
-      const inTimeRange = metricTime >= startTime && metricTime <= endTime;
-      const matchesName = !name || metric.name === name;
-      return inTimeRange && matchesName;
-    });
-  }
-
   public getMetricStatistics(name: string): {
     count: number;
     min: number;
@@ -166,44 +153,8 @@ export class PerformanceMonitor {
     };
   }
 
-  public getTopMetrics(limit: number = 10): Array<{
-    name: string;
-    count: number;
-    avg: number;
-    latest: number;
-  }> {
-    const metricGroups = new Map<string, PerformanceMetric[]>();
-
-    this.metrics.forEach(metric => {
-      if (!metricGroups.has(metric.name)) {
-        metricGroups.set(metric.name, []);
-      }
-      metricGroups.get(metric.name)!.push(metric);
-    });
-
-    const results = Array.from(metricGroups.entries()).map(([name, metrics]) => {
-      const values = metrics.map(m => m.value);
-      const sum = values.reduce((acc, val) => acc + val, 0);
-      
-      return {
-        name,
-        count: metrics.length,
-        avg: sum / values.length,
-        latest: values[values.length - 1]
-      };
-    });
-
-    return results
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit);
-  }
-
   public clearMetrics(): void {
     this.metrics = [];
-  }
-
-  public clearMetricsByName(name: string): void {
-    this.metrics = this.metrics.filter(metric => metric.name !== name);
   }
 
   public exportMetrics(format: 'json' | 'csv' = 'json'): string {
@@ -228,10 +179,6 @@ export class PerformanceMonitor {
     }
   }
 
-  public getActiveTimers(): PerformanceTimer[] {
-    return Array.from(this.timers.values());
-  }
-
   public getSystemMetrics(): PerformanceMetric[] {
     const memUsage = process.memoryUsage();
     const uptime = process.uptime();
@@ -246,18 +193,6 @@ export class PerformanceMonitor {
       {
         name: 'system_memory_heap_used',
         value: memUsage.heapUsed,
-        unit: 'bytes',
-        timestamp: new Date().toISOString()
-      },
-      {
-        name: 'system_memory_heap_total',
-        value: memUsage.heapTotal,
-        unit: 'bytes',
-        timestamp: new Date().toISOString()
-      },
-      {
-        name: 'system_memory_external',
-        value: memUsage.external,
         unit: 'bytes',
         timestamp: new Date().toISOString()
       },
@@ -278,31 +213,3 @@ export class PerformanceMonitor {
 }
 
 export const performanceMonitor = PerformanceMonitor.getInstance();
-
-// Decorator for measuring function performance
-export function measurePerformance(name?: string, tags?: Record<string, string>) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    const metricName = name || `${target.constructor.name}.${propertyKey}`;
-
-    descriptor.value = function (...args: any[]) {
-      return performanceMonitor.measureFunction(metricName, () => originalMethod.apply(this, args), tags);
-    };
-
-    return descriptor;
-  };
-}
-
-// Decorator for measuring async function performance
-export function measureAsyncPerformance(name?: string, tags?: Record<string, string>) {
-  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    const metricName = name || `${target.constructor.name}.${propertyKey}`;
-
-    descriptor.value = async function (...args: any[]) {
-      return await performanceMonitor.measureAsyncFunction(metricName, () => originalMethod.apply(this, args), tags);
-    };
-
-    return descriptor;
-  };
-}

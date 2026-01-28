@@ -67,7 +67,6 @@ export class EnhancedLogger {
   private addLog(entry: LogEntry): void {
     this.logs.push(entry);
     
-    // Maintain log size limit
     if (this.logs.length > this.maxLogSize) {
       this.logs = this.logs.slice(-this.maxLogSize);
     }
@@ -125,13 +124,6 @@ export class EnhancedLogger {
     }
     
     return filteredLogs;
-  }
-
-  public getLogsByTimeRange(startTime: Date, endTime: Date): LogEntry[] {
-    return this.logs.filter(log => {
-      const logTime = new Date(log.timestamp);
-      return logTime >= startTime && logTime <= endTime;
-    });
   }
 
   public clearLogs(): void {

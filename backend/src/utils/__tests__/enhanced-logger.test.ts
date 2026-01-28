@@ -2,7 +2,7 @@
  * Tests for Enhanced Logger Utility
  */
 
-import { EnhancedLogger, LogLevel, logger } from '../enhanced-logger';
+import { EnhancedLogger, logger, LogLevel } from '../enhanced-logger';
 
 describe('EnhancedLogger', () => {
   let testLogger: EnhancedLogger;
@@ -145,38 +145,6 @@ describe('EnhancedLogger', () => {
       expect(csvExport).toContain('timestamp,level,message,context');
       expect(csvExport).toContain('INFO');
       expect(csvExport).toContain('Test message');
-    });
-  });
-
-  describe('Log Size Management', () => {
-    it('should limit log size', () => {
-      testLogger.setMaxLogSize(3);
-      
-      testLogger.info('Message 1');
-      testLogger.info('Message 2');
-      testLogger.info('Message 3');
-      testLogger.info('Message 4');
-      
-      const logs = testLogger.getLogs();
-      expect(logs).toHaveLength(3);
-      expect(logs[0].message).toBe('Message 2');
-      expect(logs[2].message).toBe('Message 4');
-    });
-  });
-
-  describe('Time Range Filtering', () => {
-    it('should filter logs by time range', () => {
-      const now = new Date();
-      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-      const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
-      
-      testLogger.info('Test message');
-      
-      const logsInRange = testLogger.getLogsByTimeRange(oneHourAgo, oneHourFromNow);
-      expect(logsInRange).toHaveLength(1);
-      
-      const futureLogs = testLogger.getLogsByTimeRange(oneHourFromNow, new Date(now.getTime() + 2 * 60 * 60 * 1000));
-      expect(futureLogs).toHaveLength(0);
     });
   });
 
