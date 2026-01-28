@@ -2,7 +2,7 @@
  * Tests for Performance Monitor Utility
  */
 
-import { PerformanceMonitor, performanceMonitor, measurePerformance, measureAsyncPerformance } from '../performance-monitor';
+import { PerformanceMonitor, performanceMonitor } from '../performance-monitor';
 
 describe('PerformanceMonitor', () => {
   let monitor: PerformanceMonitor;
@@ -68,6 +68,11 @@ describe('PerformanceMonitor', () => {
   describe('Function Measurement', () => {
     it('should measure synchronous function execution', () => {
       const result = monitor.measureFunction('test_function', () => {
+        // Add a small delay to ensure measurable duration
+        const start = Date.now();
+        while (Date.now() - start < 1) {
+          // Busy wait for at least 1ms
+        }
         return 42;
       });
       
@@ -277,6 +282,11 @@ describe('Performance Decorators', () => {
   describe('measurePerformance', () => {
     it('should measure function performance directly', () => {
       const result = monitor.measureFunction('direct_test', () => {
+        // Add a small delay to ensure measurable duration
+        const start = Date.now();
+        while (Date.now() - start < 1) {
+          // Busy wait for at least 1ms
+        }
         return 42;
       });
 
